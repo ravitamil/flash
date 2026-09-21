@@ -32,7 +32,7 @@ class StartupFailure extends StatelessWidget {
                 const SizedBox(height: 12),
                 const Text(
                   'Nothing has been lost. Please send this message to '
-                  'github.com/InlitX/streak/issues so it can be fixed.',
+                  'github.com/ravitamil/flash/issues so it can be fixed.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),

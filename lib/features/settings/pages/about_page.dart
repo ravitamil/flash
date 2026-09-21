@@ -16,7 +16,8 @@ import 'package:streak/core/express/express_surface.dart';
 import 'package:streak/core/express/express_type.dart';
 import 'package:streak/core/minimal/minimal_type.dart';
 
-const _kGitHubUrl = 'https://github.com/InlitX/streak';
+const _kFlashGitHubUrl = 'https://github.com/ravitamil/flash';
+const _kStreakGitHubUrl = 'https://github.com/InlitX/streak';
 const _kProfileUrl = 'https://github.com/InlitX';
 const _kCoffeeUrl = 'https://ko-fi.com/inlitx';
 const _base = Duration(milliseconds: 340);
@@ -183,26 +184,68 @@ class _AboutPageState extends State<AboutPage> {
               style: storyStyle,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
           Entrance(
             index: 4,
             delay: _base,
-            child: Row(
-              children: [
-                Expanded(
-                  child: _LinkButton(
-                    icon: LucideIcons.star,
-                    label: 'GitHub',
-                    onTap: () => _open(_kGitHubUrl),
-                  ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: scheme.outlineVariant.withValues(alpha: 0.3),
                 ),
-                const SizedBox(width: Express.groupGap),
-                Expanded(
-                  child: _LinkButton(
-                    icon: LucideIcons.coffee,
-                    label: context.l10n.buy_coffee,
-                    onTap: () => _open(_kCoffeeUrl),
+              ),
+              child: Row(
+                children: [
+                  Icon(LucideIcons.gitFork, size: 20, color: scheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Flash is an open-source productivity fork of Streak by @InlitX.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.4,
+                        fontWeight: FontWeight.w500,
+                        color: scheme.onSurface.withValues(alpha: 0.9),
+                      ),
+                    ),
                   ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Entrance(
+            index: 5,
+            delay: _base,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _LinkButton(
+                        icon: LucideIcons.star,
+                        label: 'Flash GitHub',
+                        onTap: () => _open(_kFlashGitHubUrl),
+                      ),
+                    ),
+                    const SizedBox(width: Express.groupGap),
+                    Expanded(
+                      child: _LinkButton(
+                        icon: LucideIcons.gitFork,
+                        label: 'Original Streak',
+                        onTap: () => _open(_kStreakGitHubUrl),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _LinkButton(
+                  icon: LucideIcons.coffee,
+                  label: context.l10n.buy_coffee,
+                  onTap: () => _open(_kCoffeeUrl),
                 ),
               ],
             ),
@@ -210,7 +253,7 @@ class _AboutPageState extends State<AboutPage> {
 
           const SizedBox(height: 40),
           Entrance(
-            index: 5,
+            index: 6,
             delay: _base,
             child: Center(
               child: _MadeBy(onTap: () => _open(_kProfileUrl)),
@@ -218,11 +261,11 @@ class _AboutPageState extends State<AboutPage> {
           ),
           const SizedBox(height: 10),
           Entrance(
-            index: 6,
+            index: 7,
             delay: _base,
             child: Center(
               child: Text(
-                _version,
+                '$_version (Flash)',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
