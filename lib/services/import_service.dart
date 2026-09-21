@@ -212,7 +212,7 @@ class ImportService {
         habits.fold<int>(0, (a, h) => a + h.completions.length);
     return ImportOutcome(
       habits: habits,
-      source: 'Streak',
+      source: 'Flash',
       entries: entries,
       skipped: 0,
     );
@@ -579,7 +579,10 @@ class ImportService {
   }
 
   static bool _isStreakBackup(dynamic decoded) {
-    if (decoded is Map && decoded['app'] == 'streak') return true;
+    if (decoded is Map &&
+        (decoded['app'] == 'flash' || decoded['app'] == 'streak')) {
+      return true;
+    }
     if (decoded is Map && decoded['habits'] is List) {
       final list = decoded['habits'] as List;
       return list.isNotEmpty &&

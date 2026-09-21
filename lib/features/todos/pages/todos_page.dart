@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:streak/app/theme/app_tokens.dart';
+import 'package:streak/core/database/local_store.dart';
 import 'package:streak/core/extensions/inset_extensions.dart';
 import 'package:streak/core/i18n/l10n.dart';
 import 'package:streak/core/routing/app_navigator.dart';
@@ -13,7 +14,6 @@ import 'package:streak/core/widgets/app_empty_state.dart';
 import 'package:streak/core/widgets/app_text_field.dart';
 import 'package:streak/core/widgets/delete_sheet.dart';
 import 'package:streak/core/widgets/entrance.dart';
-import 'package:streak/core/widgets/section_label.dart';
 import 'package:streak/core/widgets/stacked_corners.dart';
 import 'package:streak/features/settings/state/settings_controller.dart';
 import 'package:streak/core/express/express_button.dart';
@@ -40,9 +40,9 @@ class TodosPage extends StatefulWidget {
 }
 
 class _TodosPageState extends State<TodosPage> {
-  bool _showCompleted = false;
+  bool _showCompletedOnly = false;
   bool _searching = false;
-  late bool _folders = context.read<TodoTagsController>().projects.isNotEmpty;
+  late bool _folders = LocalStore.setting<bool>('todo_view_folders', false);
   String _query = '';
   String? _tagFilter;
   String? _projectFilter;
@@ -81,11 +81,18 @@ class _TodosPageState extends State<TodosPage> {
     super.dispose();
   }
 
-  bool get _holdsBack => _searching || (!_folders && _projectFilter != null);
+  bool get _holdsBack =>
+      _searching || _showCompletedOnly || (!_folders && _projectFilter != null);
 
   bool _backOut() {
     if (!_holdsBack || !BackHandlers.isVisible(context)) return false;
-    _searching ? _toggleSearch() : _closeFolder();
+    if (_searching) {
+      _toggleSearch();
+    } else if (_showCompletedOnly) {
+      setState(() => _showCompletedOnly = false);
+    } else {
+      _closeFolder();
+    }
     return true;
   }
 
@@ -98,7 +105,7 @@ class _TodosPageState extends State<TodosPage> {
   void _closeFolder() => setState(() {
         _projectFilter = null;
         _tagFilter = null;
-        _folders = true;
+        _folders = LocalStore.setting<bool>('todo_view_folders', false);
       });
 
   bool get _filtering =>
@@ -137,7 +144,10 @@ class _TodosPageState extends State<TodosPage> {
     if (!mounted || project == null) return;
     if (!project) return _compose();
     await createProject(context);
-    if (mounted) setState(() => _folders = true);
+    if (mounted) {
+      setState(() => _folders = true);
+      LocalStore.writeSetting('todo_view_folders', true);
+    }
   }
 
   Future<void> _delete(Todo todo) async {
@@ -198,7 +208,9 @@ class _TodosPageState extends State<TodosPage> {
       child: Scaffold(
       appBar: AppBar(
         toolbarHeight: minimal || express ? 52 : null,
-        title: minimal || express ? null : Text(context.l10n.todos),
+        title: minimal || express
+            ? null
+            : Text(_showCompletedOnly ? 'Completed' : context.l10n.todos),
         leading: minimal && Navigator.of(context).canPop()
             ? IconButton(
                 icon: const Icon(LucideIcons.arrowLeft),
@@ -218,6 +230,7 @@ class _TodosPageState extends State<TodosPage> {
                 _searching = false;
                 _query = '';
               }
+              LocalStore.writeSetting('todo_view_folders', _folders);
             }),
           ),
           if (searchable && !_folders)
@@ -227,7 +240,7 @@ class _TodosPageState extends State<TodosPage> {
                   size: 20),
               onPressed: _toggleSearch,
             ),
-          if (completed.isNotEmpty && !_searching && !_folders)
+          if (_showCompletedOnly && completed.isNotEmpty && !_searching && !_folders)
             IconButton(
               tooltip: context.l10n.todo_clear_completed,
               icon: const Icon(LucideIcons.eraser, size: 20),
@@ -266,6 +279,15 @@ class _TodosPageState extends State<TodosPage> {
                   minimal: minimal,
                   onSelected: (id) => setState(() => _tagFilter = id),
                 ),
+              if (!_folders)
+                _TodoViewSwitch(
+                  completedOnly: _showCompletedOnly,
+                  pendingCount: todos.pendingCount,
+                  completedCount: completed.length,
+                  minimal: minimal,
+                  express: express,
+                  onChanged: (val) => setState(() => _showCompletedOnly = val),
+                ),
               Expanded(
                 child: _folders
                     ? SingleChildScrollView(
@@ -277,93 +299,169 @@ class _TodosPageState extends State<TodosPage> {
                         ),
                         child: TodoProjects(onOpen: _openFolder),
                       )
-                    : sections.isEmpty && completed.isEmpty
-                    ? (!_filtering
-                        ? _EmptyState(onAdd: _compose)
-                        : AppEmptyState(
-                            icon: _query.isEmpty
-                                ? LucideIcons.tag
-                                : LucideIcons.search,
-                            title: context.l10n.todo_search_empty,
-                          ))
-                    : ListView(
-              padding: context.pagePadding(
-                minimal ? 22 : 16,
-                minimal || express ? 0 : 8,
-                minimal ? 22 : 16,
-                minimal ? 96 : 148,
-              ),
-              children: [
-                if (minimal)
-                  MinimalTitle(
-                    title: context.l10n.todos,
-                    subtitle: context.l10n.todo_left(todos.pendingCount),
-                  ),
-                if (express) ...[
-                  ExpressHeadline(
-                    title: context.l10n.todos,
-                    subtitle: context.l10n.todo_left(todos.pendingCount),
-                  ),
-                  const SizedBox(height: 18),
-                ],
-                for (final section in sections) ...[
-                  _SectionHeader(
-                    label: todoGroupLabel(context, section.group),
-                    count: section.todos.length,
-                    danger: section.group == TodoGroup.overdue,
-                  ),
-                  for (final (index, todo) in section.todos.indexed)
-                    Entrance(
-                      key: ValueKey(todo.id),
-                      index: index,
-                      child: _Swipeable(
-                        todo: todo,
-                        corners: _corners(express, index, section.todos.length),
-                        onDelete: () => _delete(todo),
-                        child: TodoTile(
-                          todo: todo,
-                          overdue: section.group == TodoGroup.overdue,
-                          corners:
-                              _corners(express, index, section.todos.length),
-                          showProject: _projectFilter == null,
-                          onToggle: () => todos.toggle(todo.id),
-                          onEdit: () => _open(todo),
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 10),
-                ],
-                if (completed.isNotEmpty) ...[
-                  _CompletedHeader(
-                    count: completed.length,
-                    expanded: _showCompleted || _query.isNotEmpty,
-                    onTap: () =>
-                        setState(() => _showCompleted = !_showCompleted),
-                  ),
-                  if (_showCompleted || _query.isNotEmpty)
-                    for (final (index, todo) in completed.indexed)
-                      _Swipeable(
-                        todo: todo,
-                        corners: _corners(express, index, completed.length),
-                        onDelete: () => _delete(todo),
-                        child: TodoTile(
-                          todo: todo,
-                          overdue: false,
-                          corners: _corners(express, index, completed.length),
-                          showProject: _projectFilter == null,
-                          onToggle: () => todos.toggle(todo.id),
-                          onEdit: () => _open(todo),
-                        ),
-                      ),
-                ],
-              ],
-            ),
+                    : _showCompletedOnly
+                        ? (completed.isEmpty
+                            ? AppEmptyState(
+                                icon: LucideIcons.circleCheck,
+                                title: 'No completed tasks',
+                                message:
+                                    'Tasks you complete will appear here.',
+                              )
+                            : ListView(
+                                padding: context.pagePadding(
+                                  minimal ? 22 : 16,
+                                  minimal || express ? 0 : 8,
+                                  minimal ? 22 : 16,
+                                  minimal ? 96 : 148,
+                                ),
+                                children: [
+                                  if (minimal)
+                                    MinimalTitle(
+                                      title: 'Completed',
+                                      subtitle: '${completed.length} completed',
+                                    ),
+                                  if (express) ...[
+                                    ExpressHeadline(
+                                      title: 'Completed',
+                                      subtitle:
+                                          '${completed.length} tasks completed',
+                                    ),
+                                    const SizedBox(height: 18),
+                                  ],
+                                  for (final (index, todo) in completed.indexed)
+                                    Entrance(
+                                      key: ValueKey('comp-${todo.id}'),
+                                      index: index,
+                                      child: _Swipeable(
+                                        todo: todo,
+                                        corners: _corners(
+                                            express, index, completed.length),
+                                        onDelete: () => _delete(todo),
+                                        child: TodoTile(
+                                          todo: todo,
+                                          overdue: false,
+                                          completedView: true,
+                                          corners: _corners(
+                                              express, index, completed.length),
+                                          showProject: _projectFilter == null,
+                                          onToggle: () => todos
+                                              .undoLastCompletion(todo.id),
+                                          onEdit: () => _open(todo),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ))
+                        : (sections.isEmpty && completed.isEmpty
+                            ? (!_filtering
+                                ? _EmptyState(onAdd: _compose)
+                                : AppEmptyState(
+                                    icon: _query.isEmpty
+                                        ? LucideIcons.tag
+                                        : LucideIcons.search,
+                                    title: context.l10n.todo_search_empty,
+                                  ))
+                            : (sections.isEmpty
+                                ? AppEmptyState(
+                                    icon: LucideIcons.checkCheck,
+                                    title: 'All caught up!',
+                                    message: completed.isNotEmpty
+                                        ? 'All pending tasks completed. Switch to "Completed" to view history.'
+                                        : context.l10n.todo_empty_body,
+                                  )
+                                : ListView(
+                                    padding: context.pagePadding(
+                                      minimal ? 22 : 16,
+                                      minimal || express ? 0 : 8,
+                                      minimal ? 22 : 16,
+                                      minimal ? 96 : 148,
+                                    ),
+                                    children: [
+                                      if (minimal)
+                                        MinimalTitle(
+                                          title: context.l10n.todos,
+                                          subtitle: context.l10n
+                                              .todo_left(todos.pendingCount),
+                                        ),
+                                      if (express) ...[
+                                        ExpressHeadline(
+                                          title: context.l10n.todos,
+                                          subtitle: context.l10n
+                                              .todo_left(todos.pendingCount),
+                                        ),
+                                        const SizedBox(height: 18),
+                                      ],
+                                      for (final section in sections) ...[
+                                        _SectionHeader(
+                                          group: section.group,
+                                          label: todoGroupLabel(
+                                              context, section.group),
+                                          count: section.todos.length,
+                                          danger: section.group ==
+                                              TodoGroup.overdue,
+                                        ),
+                                        for (final (index, todo)
+                                            in section.todos.indexed)
+                                          Entrance(
+                                            key: ValueKey(todo.id),
+                                            index: index,
+                                            child: _Swipeable(
+                                              todo: todo,
+                                              corners: _corners(express, index,
+                                                  section.todos.length),
+                                              onDelete: () => _delete(todo),
+                                              child: TodoTile(
+                                                todo: todo,
+                                                overdue: section.group ==
+                                                    TodoGroup.overdue,
+                                                corners: _corners(express,
+                                                    index, section.todos.length),
+                                                showProject:
+                                                    _projectFilter == null,
+                                                onToggle: () =>
+                                                    todos.toggle(todo.id),
+                                                onEdit: () => _open(todo),
+                                              ),
+                                            ),
+                                          ),
+                                        const SizedBox(height: 10),
+                                      ],
+                                      if (_searching &&
+                                          _query.isNotEmpty &&
+                                          completed.isNotEmpty) ...[
+                                        _SectionHeader(
+                                          label: 'Completed',
+                                          count: completed.length,
+                                          danger: false,
+                                        ),
+                                        for (final (index, todo) in completed.indexed)
+                                          Entrance(
+                                            key: ValueKey('comp-${todo.id}'),
+                                            index: index,
+                                            child: _Swipeable(
+                                              todo: todo,
+                                              corners: _corners(express, index, completed.length),
+                                              onDelete: () => _delete(todo),
+                                              child: TodoTile(
+                                                todo: todo,
+                                                overdue: false,
+                                                completedView: true,
+                                                corners: _corners(express, index, completed.length),
+                                                showProject: _projectFilter == null,
+                                                onToggle: () => todos.undoLastCompletion(todo.id),
+                                                onEdit: () => _open(todo),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ],
+                                  ))),
               ),
             ],
           ),
           Positioned(
             right: (minimal ? 20 : 16) + context.safeInsets.right,
-            bottom: (minimal ? 20 : 78) + context.bottomInset,
+            bottom: (minimal ? 20 : 82) + context.bottomInset,
             child: express
                 ? ExpressFab(
                     icon: LucideIcons.plus,
@@ -382,6 +480,171 @@ class _TodosPageState extends State<TodosPage> {
 BorderRadius _corners(bool express, int index, int length) => express
     ? expressSlotRadius(index, length)
     : stackedCorners(index, length);
+
+class _TodoViewSwitch extends StatelessWidget {
+  const _TodoViewSwitch({
+    required this.completedOnly,
+    required this.pendingCount,
+    required this.completedCount,
+    required this.onChanged,
+    required this.minimal,
+    required this.express,
+  });
+
+  final bool completedOnly;
+  final int pendingCount;
+  final int completedCount;
+  final ValueChanged<bool> onChanged;
+  final bool minimal;
+  final bool express;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final muted = context.tokens.muted;
+    final edge = minimal ? 22.0 : 16.0;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(edge, 0, edge, 10),
+      child: Container(
+        height: 38,
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+          borderRadius:
+              BorderRadius.circular(express ? 20 : (minimal ? 12 : 14)),
+          border: minimal
+              ? Border.all(color: muted.withValues(alpha: 0.18))
+              : null,
+        ),
+        padding: const EdgeInsets.all(3),
+        child: Row(
+          children: [
+            Expanded(
+              child: _SwitchTab(
+                label: 'Pending',
+                count: pendingCount,
+                selected: !completedOnly,
+                minimal: minimal,
+                express: express,
+                onTap: () => onChanged(false),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: _SwitchTab(
+                label: 'Completed',
+                count: completedCount,
+                selected: completedOnly,
+                minimal: minimal,
+                express: express,
+                onTap: () => onChanged(true),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SwitchTab extends StatelessWidget {
+  const _SwitchTab({
+    required this.label,
+    required this.count,
+    required this.selected,
+    required this.minimal,
+    required this.express,
+    required this.onTap,
+  });
+
+  final String label;
+  final int count;
+  final bool selected;
+  final bool minimal;
+  final bool express;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '$label ($count)',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: selected
+                ? (minimal
+                    ? scheme.onSurface
+                    : (express ? scheme.primary : scheme.surface))
+                : Colors.transparent,
+            borderRadius:
+                BorderRadius.circular(express ? 16 : (minimal ? 9 : 11)),
+            boxShadow: selected && !minimal
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  color: selected
+                      ? (minimal
+                          ? scheme.surface
+                          : (express ? scheme.onPrimary : scheme.onSurface))
+                      : context.tokens.muted,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? (minimal
+                          ? scheme.surface.withValues(alpha: 0.25)
+                          : (express
+                              ? scheme.onPrimary.withValues(alpha: 0.25)
+                              : scheme.primary.withValues(alpha: 0.15)))
+                      : scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$count',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: selected
+                        ? (minimal
+                            ? scheme.surface
+                            : (express ? scheme.onPrimary : scheme.primary))
+                        : context.tokens.muted,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _TagBar extends StatelessWidget {
   const _TagBar({
@@ -451,6 +714,7 @@ class _AllChip extends StatelessWidget {
       icon: LucideIcons.layers,
       color: context.colors.primary,
       selected: selected,
+      selectedForeground: Colors.black,
       onTap: onTap,
     );
   }
@@ -486,6 +750,7 @@ class _PlainChip extends StatelessWidget {
     required this.color,
     required this.selected,
     required this.onTap,
+    this.selectedForeground,
   });
 
   final String label;
@@ -493,9 +758,12 @@ class _PlainChip extends StatelessWidget {
   final Color color;
   final bool selected;
   final VoidCallback onTap;
+  final Color? selectedForeground;
 
   @override
   Widget build(BuildContext context) {
+    final activeFg = selectedForeground ??
+        (color.computeLuminance() > 0.5 ? Colors.black : Colors.white);
     return Semantics(
       button: true,
       selected: selected,
@@ -512,14 +780,14 @@ class _PlainChip extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 14, color: selected ? Colors.white : color),
+              Icon(icon, size: 14, color: selected ? activeFg : color),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: selected ? Colors.white : context.tokens.muted,
+                  color: selected ? activeFg : context.tokens.muted,
                 ),
               ),
             ],
@@ -546,7 +814,7 @@ class _Swipeable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 3),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Dismissible(
         key: ValueKey('swipe-${todo.id}'),
         direction: DismissDirection.endToStart,
@@ -574,73 +842,64 @@ class _SectionHeader extends StatelessWidget {
     required this.label,
     required this.count,
     required this.danger,
+    this.group,
   });
 
   final String label;
   final int count;
   final bool danger;
+  final TodoGroup? group;
+
+  IconData get _icon => switch (group) {
+        TodoGroup.overdue => LucideIcons.alertCircle,
+        TodoGroup.today => LucideIcons.calendarCheck2,
+        TodoGroup.tomorrow => LucideIcons.calendarClock,
+        TodoGroup.upcoming => LucideIcons.calendarDays,
+        TodoGroup.someday => LucideIcons.sparkles,
+        null => LucideIcons.listTodo,
+      };
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 2),
-      child: SectionLabel(
-        label,
-        trailing: Text(
-          '$count',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: danger ? context.tokens.danger : context.tokens.muted,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CompletedHeader extends StatelessWidget {
-  const _CompletedHeader({
-    required this.count,
-    required this.expanded,
-    required this.onTap,
-  });
-
-  final int count;
-  final bool expanded;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
+    final scheme = context.colors;
     final muted = context.tokens.muted;
-    return Semantics(
-      button: true,
-      expanded: expanded,
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Row(
-            children: [
-              AnimatedRotation(
-                turns: expanded ? 0.25 : 0,
-                duration: const Duration(milliseconds: 200),
-                child: Icon(LucideIcons.chevronRight, size: 16, color: muted),
+    final color = danger ? context.tokens.danger : muted;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 14, bottom: 6, left: 2, right: 2),
+      child: Row(
+        children: [
+          Icon(_icon, size: 14.5, color: color),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(
+              label.toUpperCase(),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+                color: color,
               ),
-              const SizedBox(width: 8),
-              Text(
-                context.l10n.todo_completed_count(count),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.1,
-                  color: muted,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+            decoration: BoxDecoration(
+              color: danger
+                  ? context.tokens.danger.withValues(alpha: 0.14)
+                  : scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              '$count',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -55,10 +55,25 @@ extension DateOnly on DateTime {
   }
 }
 
-DateTime parseDayKey(String value) => DateTime(
-  int.parse(value.substring(6)),
-  int.parse(value.substring(3, 5)),
-  int.parse(value.substring(0, 2)),
-);
+DateTime parseDayKey(String value) {
+  if (value.length >= 10 && value.contains('-')) {
+    final parts = value.split('-');
+    if (parts.length == 3) {
+      if (parts[0].length == 4) {
+        return DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        );
+      }
+      return DateTime(
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
+      );
+    }
+  }
+  return DateTime.parse(value);
+}
 
 String _pad(int value) => value < 10 ? '0$value' : '$value';

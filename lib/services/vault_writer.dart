@@ -9,7 +9,7 @@ import 'package:streak/features/habits/data/habit.dart';
 import 'package:streak/features/habits/data/habit_note.dart';
 import 'package:streak/features/todos/data/todo.dart';
 
-const vaultFolder = 'Streak';
+const vaultFolder = 'Flash';
 
 class VaultWriter {
   const VaultWriter._();
@@ -117,9 +117,9 @@ class VaultWriter {
     final live = habits.where((h) => !h.isArchived).length;
     final archived = habits.length - live;
     return '''
-# Streak
+# Flash
 
-Everything Streak knows about your habits, written as plain files you can read
+Everything Flash knows about your habits, written as plain files you can read
 with any editor, or open as a vault in a notes app. Nothing here is encrypted or
 packed: it is yours.
 
@@ -141,13 +141,13 @@ Written on ${_stamp(DateTime.now())}.
 - `notes.md` the notes you wrote on habit days.
 - `focus.md` every focus session, newest first.
 
-Streak rewrites this folder on every automatic backup, so anything you add here
+Flash rewrites this folder on every automatic backup, so anything you add here
 under a name of its own is left alone, but edits to these files are overwritten.
 
 ## Restoring
 
-These files are for reading. What Streak restores from is the
-`streak_backup_*.json` sitting in the folder above this one. To bring your data
+These files are for reading. What Flash restores from is the
+`flash_backup_*.json` sitting in the folder above this one. To bring your data
 back, use Settings > Data > Import backup and pick the newest of those. Editing
 the markdown here does not change anything in the app.
 ''';

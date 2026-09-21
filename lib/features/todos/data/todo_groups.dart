@@ -27,8 +27,9 @@ List<TodoSection> groupPending(List<Todo> todos, DateTime today) {
 }
 
 List<Todo> sortCompleted(List<Todo> todos) {
-  final list = todos.where((t) => t.done).toList()
-    ..sort((a, b) => (b.doneAt ?? b.createdAt).compareTo(a.doneAt ?? a.createdAt));
+  final list = todos.where((t) => t.hasCompletions).toList()
+    ..sort((a, b) => (b.lastCompletedAt ?? b.doneAt ?? b.createdAt)
+        .compareTo(a.lastCompletedAt ?? a.doneAt ?? a.createdAt));
   return list;
 }
 

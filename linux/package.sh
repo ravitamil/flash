@@ -7,17 +7,17 @@ tool=https://github.com/AppImage/appimagetool/releases/download/continuous/appim
 runtime=https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
 
 rm -rf "$out"
-mkdir -p "$out/Streak" "$out/AppDir/usr/bin"
+mkdir -p "$out/Flash" "$out/AppDir/usr/bin"
 
-cp -r "$bundle"/. "$out/Streak/"
-tar -C "$out" -czf Streak-linux-x64.tar.gz Streak
+cp -r "$bundle"/. "$out/Flash/"
+tar -C "$out" -czf Flash-linux-x64.tar.gz Flash
 
 cp -r "$bundle"/. "$out/AppDir/usr/bin/"
-cp "$bundle/com.streak.app.desktop" "$bundle/com.streak.app.png" "$out/AppDir/"
-ln -s com.streak.app.png "$out/AppDir/.DirIcon"
-ln -s usr/bin/Streak "$out/AppDir/AppRun"
+cp "$bundle/com.flash.app.desktop" "$bundle/com.flash.app.png" "$out/AppDir/"
+ln -s com.flash.app.png "$out/AppDir/.DirIcon"
+ln -s usr/bin/Flash "$out/AppDir/AppRun"
 
 curl -fsSL -o "$out/appimagetool" "$tool"
 curl -fsSL -o "$out/runtime" "$runtime"
 chmod +x "$out/appimagetool"
-ARCH=x86_64 "$out/appimagetool" --appimage-extract-and-run --runtime-file "$out/runtime" "$out/AppDir" Streak-x86_64.AppImage
+ARCH=x86_64 "$out/appimagetool" --appimage-extract-and-run --runtime-file "$out/runtime" "$out/AppDir" Flash-x86_64.AppImage

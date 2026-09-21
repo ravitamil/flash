@@ -45,7 +45,6 @@ class ExpressSettingsPage extends StatelessWidget {
             icon: LucideIcons.smartphone,
             title: context.l10n.app_style,
             value: switch (settings.appStyle) {
-              1 => context.l10n.style_minimal,
               2 => context.l10n.style_express,
               _ => context.l10n.style_classic,
             },
@@ -361,11 +360,6 @@ List<Widget> _appearanceTiles(BuildContext context) {
     context.l10n.dark,
   ];
   final checks = [context.l10n.square, context.l10n.circle];
-  final icons = [
-    context.l10n.icon_default,
-    context.l10n.icon_neutral,
-    context.l10n.icon_accent,
-  ];
 
   return [
     ExpressGroup(
@@ -417,20 +411,6 @@ List<Widget> _appearanceTiles(BuildContext context) {
             onSelected: settings.setCheckStyle,
           ),
         ),
-        if (hasAppIcons)
-          ExpressTile(
-            icon: LucideIcons.appWindow,
-            title: context.l10n.app_icon,
-            subtitle: context.l10n.app_icon_sub,
-            value: icons[settings.appIcon],
-            onTap: () => showOptionSheet(
-              context,
-              title: context.l10n.app_icon,
-              options: icons,
-              index: settings.appIcon,
-              onSelected: settings.setAppIcon,
-            ),
-          ),
       ],
     ),
   ];

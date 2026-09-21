@@ -28,11 +28,14 @@ import 'package:streak/features/island/widgets/island_entry.dart';
 import 'package:streak/features/habits/widgets/saved_money.dart';
 import 'package:streak/features/settings/state/settings_controller.dart';
 import 'package:streak/features/statistics/data/habit_stats.dart';
+import 'package:streak/features/statistics/pages/statistics_page.dart';
 import 'package:streak/features/statistics/widgets/period_totals.dart';
 import 'package:streak/features/statistics/widgets/express_line_chart.dart';
 import 'package:streak/features/statistics/widgets/express_stat_kit.dart';
 import 'package:streak/features/statistics/widgets/stat_charts.dart';
+import 'package:streak/features/statistics/widgets/todo_statistics_view.dart';
 import 'package:streak/features/statistics/widgets/year_heatmap.dart';
+import 'package:streak/features/todos/state/todos_controller.dart';
 
 class ExpressStatisticsPage extends StatefulWidget {
   const ExpressStatisticsPage({super.key});
@@ -45,6 +48,7 @@ class _ExpressStatisticsPageState extends State<ExpressStatisticsPage> {
   int _tab = 0;
   int _year = AppClock.now().year;
   String? _habitId;
+  StatScope _scope = StatScope.habits;
 
   ({List<Habit> habits, String? id, int year})? _statsKey;
   HabitStats _stats = HabitStats.empty;
@@ -64,6 +68,53 @@ class _ExpressStatisticsPageState extends State<ExpressStatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsController>();
+    final todosController = context.watch<TodosController>();
+    final habitsController = context.watch<HabitsController>();
+    final todos = todosController.all;
+    final all = habitsController.habits;
+    final todosEnabled = settings.todosEnabled;
+
+    final hasHabits = all.isNotEmpty;
+    final hasTodos = todos.isNotEmpty;
+
+    if (!hasHabits && (!todosEnabled || !hasTodos)) {
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            context.l10n.statistics,
+            style: ExpressType.display.at(
+              24,
+              spacing: -0.2,
+              color: context.colors.onSurface,
+            ),
+          ),
+        ),
+        body: AppEmptyState(
+          icon: LucideIcons.chartColumn,
+          title: context.l10n.no_data_yet,
+          message: context.l10n.stats_empty,
+        ),
+      );
+    }
+
+    final activeScope = (!hasHabits && todosEnabled && hasTodos)
+        ? StatScope.todos
+        : (todosEnabled ? _scope : StatScope.habits);
+
+    if (_habitId != null && habitsController.byId(_habitId!) == null) {
+      _habitId = null;
+    }
+    final scoped = _habitId == null
+        ? HabitStats.counted(all)
+        : [habitsController.byId(_habitId!)!];
+    final accent =
+        _habitId == null ? context.colors.primary : scoped.first.color;
+    final stats = hasHabits ? _statsFor(scoped, all) : HabitStats.empty;
+
+    final wide = isWideLayout(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -76,73 +127,75 @@ class _ExpressStatisticsPageState extends State<ExpressStatisticsPage> {
           ),
         ),
       ),
-      body: Consumer<HabitsController>(
-        builder: (context, controller, _) {
-          final all = controller.habits;
-          if (all.isEmpty) {
-            return AppEmptyState(
-              icon: LucideIcons.chartColumn,
-              title: context.l10n.no_data_yet,
-              message: context.l10n.stats_empty,
-            );
-          }
-
-          if (_habitId != null && controller.byId(_habitId!) == null) {
-            _habitId = null;
-          }
-          final scoped = _habitId == null
-              ? HabitStats.counted(all)
-              : [controller.byId(_habitId!)!];
-          final accent = _habitId == null
-              ? context.colors.primary
-              : scoped.first.color;
-          final stats = _statsFor(scoped, all);
-
-          final wide = isWideLayout(context);
-
-          return Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: wide ? 1080 : 760),
-              child: ListView(
-                padding: context.pagePadding(16, 4, 16, 128),
-                children: [
-                  _Header(
-                    wide: wide,
-                    child: ExpressTabs(
-                      labels: [context.l10n.overview, context.l10n.activity],
-                      index: _tab,
-                      onChanged: (i) => setState(() => _tab = i),
-                    ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: wide ? 1080 : 760),
+          child: ListView(
+            padding: context.pagePadding(16, 4, 16, 128),
+            children: [
+              if (todosEnabled && (hasHabits || hasTodos)) ...[
+                _Header(
+                  wide: wide,
+                  child: ExpressTabs(
+                    labels: const ['Habits', 'Tasks'],
+                    index: activeScope == StatScope.habits ? 0 : 1,
+                    onChanged: (i) => setState(() =>
+                        _scope = i == 0 ? StatScope.habits : StatScope.todos),
                   ),
-                  const SizedBox(height: 16),
-                  const IslandEntry(),
-                  _HabitScope(
-                    habits: all,
-                    selected: _habitId,
-                    onSelected: (id) => setState(() => _habitId = id),
+                ),
+                const SizedBox(height: 16),
+              ],
+              if (activeScope == StatScope.todos)
+                TodoStatisticsView(
+                  todos: todos,
+                  year: _year,
+                  onYearChanged: (y) => setState(() => _year = y),
+                )
+              else if (!hasHabits)
+                AppEmptyState(
+                  icon: LucideIcons.sprout,
+                  title: context.l10n.no_habits_yet,
+                  message: context.l10n.stats_empty,
+                  compact: true,
+                )
+              else ...[
+                _Header(
+                  wide: wide,
+                  child: ExpressTabs(
+                    labels: [context.l10n.overview, context.l10n.activity],
+                    index: _tab,
+                    onChanged: (i) => setState(() => _tab = i),
                   ),
-                  const SizedBox(height: 14),
-                  _Header(
-                    wide: wide,
-                    child: ExpressYearNav(
-                      year: _year,
-                      canGoForward: _year < AppClock.now().year,
-                      onChanged: (delta) => setState(() => _year += delta),
-                    ),
+                ),
+                const SizedBox(height: 16),
+                const IslandEntry(),
+                _HabitScope(
+                  habits: all,
+                  selected: _habitId,
+                  onSelected: (id) => setState(() => _habitId = id),
+                ),
+                const SizedBox(height: 14),
+                _Header(
+                  wide: wide,
+                  child: ExpressYearNav(
+                    year: _year,
+                    canGoForward: _year < AppClock.now().year,
+                    onChanged: (delta) => setState(() => _year += delta),
                   ),
-                  const SizedBox(height: 20),
-                  AnimatedSwitcher(
-                    duration: Express.quick,
-                    switchInCurve: Express.emphasized,
-                    switchOutCurve: Express.emphasized,
-                    layoutBuilder: (current, previous) => Stack(
-                      alignment: Alignment.topCenter,
-                      children: [
-                        for (final child in previous)
-                          Positioned(left: 0, right: 0, child: child),
-                        if (current != null) current,
-                      ],
-                    ),
+                ),
+                const SizedBox(height: 20),
+                AnimatedSwitcher(
+                  duration: Express.quick,
+                  switchInCurve: Express.emphasized,
+                  switchOutCurve: Express.emphasized,
+                  layoutBuilder: (current, previous) => Stack(
+                    alignment: Alignment.topCenter,
+                    children: [
+                      for (final child in previous)
+                        Positioned(left: 0, right: 0, child: child),
+                      if (current != null) current,
+                    ],
+                  ),
                     transitionBuilder: (child, animation) {
                       final incoming = child.key == ValueKey(_tab);
                       final shift =
@@ -189,12 +242,11 @@ class _ExpressStatisticsPageState extends State<ExpressStatisticsPage> {
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
-          );
-        },
-      ),
-    );
+          ),
+        ),
+      );
   }
 
   List<Widget> _overview(

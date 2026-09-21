@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:streak/app/theme/app_tokens.dart';
+import 'package:streak/core/extensions/date_extensions.dart';
 import 'package:streak/core/i18n/l10n.dart';
 import 'package:streak/core/utils/responsive.dart';
 import 'package:streak/core/widgets/photo_deck.dart';
@@ -14,6 +15,7 @@ import 'package:streak/features/todos/data/todo.dart';
 import 'package:streak/features/todos/state/todo_tags_controller.dart';
 import 'package:streak/features/todos/state/todos_controller.dart';
 import 'package:streak/features/todos/widgets/todo_labels.dart';
+import 'package:streak/features/todos/widgets/todo_note_sheet.dart';
 import 'package:streak/features/todos/widgets/todo_tag_sheet.dart';
 
 Future<String?> showTodoPreview(BuildContext context, Todo todo) =>
@@ -74,6 +76,9 @@ class _TodoPreview extends StatelessWidget {
     final tagsController = context.watch<TodoTagsController>();
     final tags = tagsController.resolve(todo.tags);
     final project = tagsController.byId(todo.project);
+    final isCompletedToday =
+        todo.isRecurring && todo.completedDates.contains(AppClock.today().dayKey);
+    final isCompleted = todo.done || isCompletedToday;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -158,7 +163,7 @@ class _TodoPreview extends StatelessWidget {
                                     fontWeight: FontWeight.w800,
                                     height: 1.25,
                                     color: scheme.onSurface,
-                                    decoration: todo.done
+                                    decoration: isCompleted
                                         ? TextDecoration.lineThrough
                                         : null,
                                     decorationColor: muted,
@@ -197,6 +202,9 @@ class _TodoPreview extends StatelessWidget {
                           ),
                         ),
                         if (todo.due != null ||
+                            todo.isRecurring ||
+                            (todo.durationMinutes != null &&
+                                todo.durationMinutes! > 0) ||
                             todo.priority != TodoPriority.none) ...[
                           const SizedBox(height: 16),
                           Wrap(
@@ -210,6 +218,27 @@ class _TodoPreview extends StatelessWidget {
                                       : LucideIcons.clock,
                                   label: todoDueLabel(context, todo),
                                   color: scheme.primary,
+                                ),
+                              if (todo.isRecurring)
+                                _Pill(
+                                  icon: LucideIcons.repeat,
+                                  label: todo.recurrence!.shortBadge,
+                                  color: scheme.primary,
+                                ),
+                              if (todo.isRecurring &&
+                                  todo.completedDates.isNotEmpty)
+                                _Pill(
+                                  icon: LucideIcons.checkCheck,
+                                  label:
+                                      '${todo.completedDates.length} sessions done',
+                                  color: scheme.primary,
+                                ),
+                              if (todo.durationMinutes != null &&
+                                  todo.durationMinutes! > 0)
+                                _Pill(
+                                  icon: LucideIcons.hourglass,
+                                  label: formatTodoDuration(todo.durationMinutes!),
+                                  color: muted,
                                 ),
                               if (todo.priority != TodoPriority.none)
                                 _Pill(
@@ -234,16 +263,31 @@ class _TodoPreview extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             _Round(
-                              icon: todo.done
+                              icon: isCompleted
                                   ? LucideIcons.rotateCcw
                                   : LucideIcons.check,
                               color: scheme.primary,
-                              label: todo.done
+                              label: isCompleted
                                   ? context.l10n.a11y_mark_not_done(todo.title)
                                   : context.l10n.a11y_mark_done(todo.title),
                               onTap: () {
-                                todos.toggle(todo.id);
+                                if (isCompleted) {
+                                  todos.undoLastCompletion(todo.id);
+                                } else {
+                                  todos.toggle(todo.id);
+                                }
                               },
+                            ),
+                            const SizedBox(width: 8),
+                            _Round(
+                              icon: LucideIcons.filePlus2,
+                              color: scheme.primary,
+                              label: 'Add Note',
+                              onTap: () => showTodoNoteSheet(
+                                context,
+                                todo: todo,
+                                onSave: (note) => todos.appendNote(todo.id, note),
+                              ),
                             ),
                             const Spacer(),
                             if (context

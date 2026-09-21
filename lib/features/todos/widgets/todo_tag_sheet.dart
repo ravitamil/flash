@@ -591,38 +591,46 @@ class TodoTagChip extends StatelessWidget {
                 : context.colors.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                CategoryIcons.resolve(tag.icon),
-                size: 14,
-                color: selected ? Colors.white : tag.color,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                tag.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
-                  color: selected ? Colors.white : context.tokens.muted,
+          child: () {
+            final activeFg = tag.color.computeLuminance() > 0.5
+                ? Colors.black
+                : Colors.white;
+            final activeTrailingFg = tag.color.computeLuminance() > 0.5
+                ? Colors.black.withValues(alpha: 0.75)
+                : Colors.white.withValues(alpha: 0.8);
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  CategoryIcons.resolve(tag.icon),
+                  size: 14,
+                  color: selected ? activeFg : tag.color,
                 ),
-              ),
-              if (trailing.isNotEmpty) ...[
                 const SizedBox(width: 6),
                 Text(
-                  trailing,
+                  tag.name,
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 11.5,
-                    color: selected
-                        ? Colors.white.withValues(alpha: 0.8)
-                        : context.tokens.muted.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: selected ? activeFg : context.tokens.muted,
                   ),
                 ),
+                if (trailing.isNotEmpty) ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    trailing,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11.5,
+                      color: selected
+                          ? activeTrailingFg
+                          : context.tokens.muted.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
               ],
-            ],
-          ),
+            );
+          }(),
         ),
       ),
     );

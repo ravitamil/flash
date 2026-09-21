@@ -16,8 +16,10 @@ import 'package:streak/features/settings/widgets/minimal_settings_widgets.dart';
 import 'package:streak/features/habits/data/category.dart';
 import 'package:streak/features/habits/widgets/substep_draft.dart';
 import 'package:streak/features/todos/data/todo.dart';
+import 'package:streak/features/todos/data/todo_recurrence.dart';
 import 'package:streak/features/todos/state/todos_controller.dart';
 import 'package:streak/features/todos/state/todo_tags_controller.dart';
+import 'package:streak/features/todos/widgets/todo_duration_sheet.dart';
 import 'package:streak/features/todos/widgets/todo_labels.dart';
 import 'package:streak/features/todos/widgets/todo_tag_sheet.dart';
 
@@ -25,11 +27,18 @@ Future<void> showTodoComposer(
   BuildContext context, {
   Todo? todo,
   String project = '',
+  String? initialDate,
+  int? initialMinutes,
 }) async {
   if (isWideLayout(context)) {
     AppNavigator.clearPane();
     await AppNavigator.push<void>(
-      _ComposerPage(todo: todo, project: project),
+      _ComposerPage(
+        todo: todo,
+        project: project,
+        initialDate: initialDate,
+        initialMinutes: initialMinutes,
+      ),
       fade: true,
     );
     return;
@@ -38,15 +47,27 @@ Future<void> showTodoComposer(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _TodoComposer(todo: todo, project: project),
+    builder: (_) => _TodoComposer(
+      todo: todo,
+      project: project,
+      initialDate: initialDate,
+      initialMinutes: initialMinutes,
+    ),
   );
 }
 
 class _ComposerPage extends StatelessWidget {
-  const _ComposerPage({this.todo, this.project = ''});
+  const _ComposerPage({
+    this.todo,
+    this.project = '',
+    this.initialDate,
+    this.initialMinutes,
+  });
 
   final Todo? todo;
   final String project;
+  final String? initialDate;
+  final int? initialMinutes;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +84,12 @@ class _ComposerPage extends StatelessWidget {
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: phoneWidth),
-            child: _TodoComposer(todo: todo, project: project),
+            child: _TodoComposer(
+              todo: todo,
+              project: project,
+              initialDate: initialDate,
+              initialMinutes: initialMinutes,
+            ),
           ),
         ),
       ),
@@ -72,10 +98,17 @@ class _ComposerPage extends StatelessWidget {
 }
 
 class _TodoComposer extends StatefulWidget {
-  const _TodoComposer({this.todo, this.project = ''});
+  const _TodoComposer({
+    this.todo,
+    this.project = '',
+    this.initialDate,
+    this.initialMinutes,
+  });
 
   final Todo? todo;
   final String project;
+  final String? initialDate;
+  final int? initialMinutes;
 
   @override
   State<_TodoComposer> createState() => _TodoComposerState();
@@ -84,8 +117,10 @@ class _TodoComposer extends StatefulWidget {
 class _TodoComposerState extends State<_TodoComposer> {
   late final _text = TextEditingController(text: widget.todo?.text ?? '');
   final _textFocus = FocusNode();
-  late String _date = widget.todo?.date ?? '';
-  late int? _minutes = widget.todo?.minutes;
+  late String _date = widget.todo?.date ?? widget.initialDate ?? '';
+  late int? _minutes = widget.todo?.minutes ?? widget.initialMinutes;
+  late int? _durationMinutes = widget.todo?.durationMinutes;
+  late TodoRecurrence? _recurrence = widget.todo?.recurrence;
   late TodoPriority _priority = widget.todo?.priority ?? TodoPriority.none;
   late final List<String> _photos = [...?widget.todo?.photos];
   late List<String> _tags = [...?widget.todo?.tags];
@@ -137,6 +172,8 @@ class _TodoComposerState extends State<_TodoComposer> {
           setState(() {
             _date = '';
             _minutes = null;
+            _durationMinutes = null;
+            _recurrence = null;
           });
           return;
         }
@@ -167,7 +204,108 @@ class _TodoComposerState extends State<_TodoComposer> {
     setState(() {
       _minutes = picked.hour * 60 + picked.minute;
       if (_date.isEmpty) _date = AppClock.today().dayKey;
+      _durationMinutes ??= 30;
     });
+  }
+
+  Future<void> _pickRecurrence() async {
+    final options = [
+      'Does not repeat',
+      'Every day',
+      'Every weekday (Mon–Fri)',
+      'Every week',
+      'Every month',
+    ];
+    final current = switch (_recurrence?.kind) {
+      null || TodoRecurrenceKind.none => 0,
+      TodoRecurrenceKind.daily => 1,
+      TodoRecurrenceKind.weekdays => 2,
+      TodoRecurrenceKind.weekly => 3,
+      TodoRecurrenceKind.monthly => 4,
+      _ => 0,
+    };
+
+    await showOptionSheet(
+      context,
+      title: 'Repeat',
+      options: options,
+      index: current,
+      onSelected: (index) {
+        setState(() {
+          if (index == 0) {
+            _recurrence = null;
+          } else if (index == 1) {
+            _recurrence = const TodoRecurrence(kind: TodoRecurrenceKind.daily);
+          } else if (index == 2) {
+            _recurrence = const TodoRecurrence(kind: TodoRecurrenceKind.weekdays);
+          } else if (index == 3) {
+            _recurrence = const TodoRecurrence(kind: TodoRecurrenceKind.weekly);
+          } else if (index == 4) {
+            _recurrence = const TodoRecurrence(kind: TodoRecurrenceKind.monthly);
+          }
+          if (_recurrence != null && _date.isEmpty) {
+            _date = AppClock.today().dayKey;
+          }
+        });
+      },
+    );
+  }
+
+  Future<void> _pickDuration() async {
+    const presets = [15, 30, 45, 60, 90, 120, 180];
+    final isCustom = _durationMinutes != null &&
+        !presets.contains(_durationMinutes);
+    final customLabel = isCustom
+        ? 'Custom (${formatTodoDuration(_durationMinutes!)})'
+        : 'Custom duration...';
+
+    final options = [
+      '15 minutes',
+      '30 minutes',
+      '45 minutes',
+      '1 hour (60m)',
+      '1h 30m (90m)',
+      '2 hours (120m)',
+      '3 hours (180m)',
+      customLabel,
+      'No duration',
+    ];
+    final values = [15, 30, 45, 60, 90, 120, 180, -1, null];
+    final current = switch (_durationMinutes) {
+      15 => 0,
+      30 => 1,
+      45 => 2,
+      60 => 3,
+      90 => 4,
+      120 => 5,
+      180 => 6,
+      null => 8,
+      _ => 7,
+    };
+
+    await showOptionSheet(
+      context,
+      title: 'Duration',
+      options: options,
+      index: current,
+      onSelected: (index) async {
+        if (values[index] == -1) {
+          final custom = await showCustomDurationSheet(
+            context,
+            initialMinutes: _durationMinutes,
+          );
+          if (custom != null && mounted) {
+            setState(() {
+              _durationMinutes = custom > 0 ? custom : null;
+            });
+          }
+        } else {
+          setState(() {
+            _durationMinutes = values[index];
+          });
+        }
+      },
+    );
   }
 
   Future<void> _pickPriority() => showOptionSheet(
@@ -233,6 +371,8 @@ class _TodoComposerState extends State<_TodoComposer> {
               text: _text.text,
               date: _date,
               minutes: _minutes,
+              durationMinutes: _durationMinutes,
+              recurrence: _recurrence,
               priority: _priority,
               photos: [..._photos],
               tags: _tags,
@@ -244,6 +384,10 @@ class _TodoComposerState extends State<_TodoComposer> {
                 text: _text.text.trim(),
                 date: _date,
                 minutes: _minutes,
+                durationMinutes: _durationMinutes,
+                recurrence: _recurrence,
+                clearDuration: _durationMinutes == null,
+                clearRecurrence: _recurrence == null,
                 clearMinutes: _minutes == null,
                 priority: _priority,
                 photos: _photos,
@@ -265,6 +409,8 @@ class _TodoComposerState extends State<_TodoComposer> {
       _text.clear();
       _photos.clear();
       _priority = TodoPriority.none;
+      _durationMinutes = null;
+      _recurrence = null;
       _steps.clear();
       _doneSteps.clear();
       _freshSteps.clear();
@@ -292,6 +438,9 @@ class _TodoComposerState extends State<_TodoComposer> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_date.isNotEmpty ||
+                _minutes != null ||
+                (_recurrence != null && !_recurrence!.isNone) ||
+                (_durationMinutes != null && _durationMinutes! > 0) ||
                 _priority != TodoPriority.none ||
                 _project.isNotEmpty ||
                 _tags.isNotEmpty) ...[
@@ -318,6 +467,20 @@ class _TodoComposerState extends State<_TodoComposer> {
                       ).format(context),
                       color: scheme.primary,
                       onRemove: () => setState(() => _minutes = null),
+                    ),
+                  if (_recurrence != null && !_recurrence!.isNone)
+                    _Tag(
+                      icon: LucideIcons.repeat,
+                      label: _recurrence!.label,
+                      color: scheme.primary,
+                      onRemove: () => setState(() => _recurrence = null),
+                    ),
+                  if (_durationMinutes != null && _durationMinutes! > 0)
+                    _Tag(
+                      icon: LucideIcons.hourglass,
+                      label: formatTodoDuration(_durationMinutes!),
+                      color: scheme.primary,
+                      onRemove: () => setState(() => _durationMinutes = null),
                     ),
                   if (_priority != TodoPriority.none)
                     _Tag(
@@ -489,6 +652,24 @@ class _TodoComposerState extends State<_TodoComposer> {
                           label: context.l10n.todo_time,
                           active: _minutes != null,
                           onTap: _pickTime,
+                        ),
+                        _Action(
+                          icon: LucideIcons.repeat,
+                          label: _recurrence != null && !_recurrence!.isNone
+                              ? _recurrence!.shortBadge
+                              : 'Repeat',
+                          active: _recurrence != null && !_recurrence!.isNone,
+                          onTap: _pickRecurrence,
+                        ),
+                        _Action(
+                          icon: LucideIcons.hourglass,
+                          label: _durationMinutes != null &&
+                                  _durationMinutes! > 0
+                              ? formatTodoDuration(_durationMinutes!)
+                              : 'Duration',
+                          active: _durationMinutes != null &&
+                              _durationMinutes! > 0,
+                          onTap: _pickDuration,
                         ),
                         _Action(
                           icon: LucideIcons.flag,

@@ -35,7 +35,15 @@ void main() {
     expect(find.text('OVERDUE'), findsOneWidget);
     expect(find.text('TODAY'), findsOneWidget);
     expect(find.text('SOMEDAY'), findsOneWidget);
-    expect(find.text('Completed (1)'), findsOneWidget);
+    expect(find.text('Completed'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w.runtimeType.toString() == '_SwitchTab' &&
+            (w as dynamic).label == 'Completed' &&
+            (w as dynamic).count == 1,
+      ),
+      findsOneWidget,
+    );
     expect(find.byType(TodoTile), findsNWidgets(3));
   });
 
@@ -46,7 +54,7 @@ void main() {
 
     expect(find.text('Water the plants'), findsNothing);
 
-    await tester.tap(find.text('Completed (1)'));
+    await tester.tap(find.text('Completed'));
     await tester.pumpAndSettle();
 
     expect(find.text('Water the plants'), findsOneWidget);
@@ -60,7 +68,15 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Mark Buy a lamp as done'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Completed (2)'), findsOneWidget);
+    expect(find.text('Completed'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w.runtimeType.toString() == '_SwitchTab' &&
+            (w as dynamic).label == 'Completed' &&
+            (w as dynamic).count == 2,
+      ),
+      findsOneWidget,
+    );
     expect(find.text('SOMEDAY'), findsNothing);
     await tester.pump(const Duration(seconds: 1));
     handle.dispose();
@@ -145,6 +161,7 @@ void main() {
             ),
           );
         }
+        await LocalStore.writeSetting('todo_view_folders', true);
       });
 
   List<String> onScreen(WidgetTester tester) {
@@ -177,17 +194,22 @@ void main() {
 
     final start = tester.getCenter(find.text('One'));
     final target = tester.getCenter(find.text('Three'));
-    final gesture = await tester.startGesture(start);
+    await tester.runAsync(() async {
+      final gesture = await tester.startGesture(start);
+      await Future.delayed(const Duration(milliseconds: 200));
+      await gesture.moveTo(target);
+      await Future.delayed(const Duration(milliseconds: 150));
+      await gesture.up();
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    await gesture.moveTo(target);
-    await tester.pump(const Duration(milliseconds: 100));
-    await gesture.up();
-    await tester.pump(const Duration(milliseconds: 400));
 
     expect(onScreen(tester), ['Two', 'Three', 'One', 'Four']);
 
     await tester.tap(find.text('Done'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Done'), findsNothing);
   });
 
@@ -215,8 +237,6 @@ void main() {
     });
     await pumpScreen(tester, const TodosPage());
 
-    await tester.tap(find.widgetWithIcon(IconButton, LucideIcons.list));
-    await tester.pumpAndSettle();
     expect(find.widgetWithText(TodoTagChip, 'urgent'), findsOneWidget);
     expect(find.widgetWithText(TodoTagChip, 'later'), findsOneWidget);
 

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streak/core/extensions/date_extensions.dart';
-import 'package:streak/core/widgets/scrolling_text.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:streak/features/habits/data/habit.dart';
 import 'package:provider/provider.dart';
 import 'package:streak/features/habits/pages/home_page.dart';
 import 'package:streak/features/habits/state/habits_controller.dart';
-import 'package:streak/features/habits/widgets/grid_habit_cards.dart';
 import 'package:streak/features/habits/widgets/habit_card.dart';
 import 'package:streak/features/habits/widgets/habit_heatmap.dart';
 
@@ -183,80 +181,6 @@ void main() {
 
   });
 
-  group('minimal', () {
-    testWidgets('the week view lists every habit', (tester) async {
-      await _seedThree(tester);
-      await _pumpHome(tester, HeatmapMode.week, minimal: true);
-
-      expect(find.byType(GridWeekCard), findsNWidgets(3));
-      expect(find.text('Read'), findsOneWidget);
-    });
-
-    testWidgets('the week card keeps the name on one line with the days',
-        (tester) async {
-      await _seedThree(tester);
-      await _pumpHome(tester, HeatmapMode.week, minimal: true);
-
-      final card = find.ancestor(
-        of: find.text('Read'),
-        matching: find.byType(GridWeekCard),
-      );
-      final name = tester.getRect(
-        find.descendant(of: card, matching: find.byType(ScrollingText)),
-      );
-
-      expect(tester.getSize(card).height, lessThan(90));
-      expect(find.text('${AppClock.now().day}'), findsNothing);
-      expect(name.width, greaterThan(60));
-    });
-
-    testWidgets('the year view lists every habit', (tester) async {
-      await _seedThree(tester);
-      await _pumpHome(tester, HeatmapMode.year, minimal: true);
-
-      expect(find.byType(GridYearCard), findsNWidgets(3));
-      expect(find.text('Read'), findsOneWidget);
-    });
-
-    testWidgets('month cards keep their calendar height', (tester) async {
-      await _seedThree(tester);
-      await _pumpHome(tester, HeatmapMode.month, minimal: true);
-
-      final cards = find.byType(GridMonthCard);
-      expect(cards, findsNWidgets(3));
-
-      for (var i = 0; i < 3; i++) {
-        final size = tester.getSize(cards.at(i));
-        expect(size.height, greaterThan(180));
-        expect(size.width, greaterThan(120));
-      }
-    });
-
-    testWidgets('the switcher moves between views', (tester) async {
-      await _seedThree(tester);
-      await _pumpHome(tester, HeatmapMode.month, minimal: true);
-
-      await tester.tap(find.byIcon(Icons.checklist_rounded));
-      await tester.pumpAndSettle();
-      expect(find.byType(GridWeekCard), findsNWidgets(3));
-      expect(find.byType(GridMonthCard), findsNothing);
-
-      await tester.tap(find.byIcon(Icons.view_agenda_outlined));
-      await tester.pumpAndSettle();
-      expect(find.byType(GridYearCard), findsNWidgets(3));
-    });
-
-    testWidgets('paired month cards match in height', (tester) async {
-      await _seedThree(tester);
-      await _pumpHome(tester, HeatmapMode.month, minimal: true);
-
-      final cards = find.byType(GridMonthCard);
-      expect(
-        tester.getSize(cards.at(0)).height,
-        tester.getSize(cards.at(1)).height,
-      );
-    });
-  });
 
   testWidgets('holding the add button asks for a custom amount', (tester) async {
     await seedHabits(tester, [
@@ -285,5 +209,23 @@ void main() {
     await tester.pump(const Duration(milliseconds: 800));
 
     expect(habits.byId('w')!.completions.values.single.count, 3);
+  });
+
+  testWidgets(
+      'AppBar has no new button and FAB is hidden when no habits',
+      (tester) async {
+    await pumpScreen(tester, const HomePage());
+    expect(find.byType(HabitAddButton), findsNothing);
+    expect(find.text('New'), findsNothing);
+    expect(find.text('Add habit'), findsOneWidget);
+  });
+
+  testWidgets(
+      'FAB appears when habits exist and AppBar has no new button',
+      (tester) async {
+    await _seedThree(tester);
+    await pumpScreen(tester, const HomePage());
+    expect(find.byType(HabitAddButton), findsOneWidget);
+    expect(find.text('New'), findsNothing);
   });
 }

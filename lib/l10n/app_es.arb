@@ -164,14 +164,14 @@
   "archive": "Archivar",
   "share_friends": "Comparte con un amigo",
   "share_friends_sub": "Mándale la app",
-  "share_friends_message": "Estoy manteniendo vivas mis rachas con Streak: una app de hábitos pequeña, gratis y sin conexión, sin cuentas ni anuncios. Anímate y crea las tuyas: https://inlitx.github.io/streak/",
+  "share_friends_message": "Estoy manteniendo vivas mis rachas con Flash: una app de hábitos pequeña, gratis y sin conexión, sin cuentas ni anuncios. Anímate y crea las tuyas: https://inlitx.github.io/streak/",
   "copy_message": "Copiar mensaje",
   "message_copied": "Mensaje copiado",
   "app_lock": "Bloqueo de la app",
-  "app_lock_sub": "Pide tu huella o tu cara para abrir Streak",
+  "app_lock_sub": "Pide tu huella o tu cara para abrir Flash",
   "app_lock_unavailable": "Este móvil no tiene biometría configurada",
   "app_lock_failed": "No se pudo comprobar que eres tú",
-  "app_lock_title": "Streak está bloqueada",
+  "app_lock_title": "Flash está bloqueada",
   "app_lock_unlock": "Desbloquear",
   "app_lock_delay": "Bloquear tras",
   "app_lock_delay_instant": "Al instante",
@@ -285,9 +285,21 @@
     }
   },
   "every_n_weeks": "Cada {n} semanas",
-  "@every_n_weeks": {"placeholders": {"n": {"type": "int"}}},
+  "@every_n_weeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "every_n_months": "Cada {n} meses",
-  "@every_n_months": {"placeholders": {"n": {"type": "int"}}},
+  "@every_n_months": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "sched_unit_days": "Dias",
   "sched_unit_weeks": "Semanas",
   "sched_unit_months": "Meses",
@@ -315,11 +327,23 @@
   "todo_tag_folders": "Carpetas",
   "todo_tag_list": "Lista",
   "todo_tag_count": "{n} pendientes",
-  "@todo_tag_count": {"placeholders": {"n": {"type": "int"}}},
+  "@todo_tag_count": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "todo_tag_icon": "Icono",
   "todo_tag_pick": "Elegir etiquetas",
   "todo_tag_filtered": "Filtrado por {name}",
-  "@todo_tag_filtered": {"placeholders": {"name": {"type": "String"}}},
+  "@todo_tag_filtered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "uncategorized": "Sin categoría",
   "more_icons": "Más iconos",
   "less_icons": "Menos iconos",
@@ -343,7 +367,7 @@
   "view_source": "Ver código en GitHub",
   "about_title": "Construido para ti. Gratis, para siempre.",
   "about_footer": "Hecho con ☕ y mucho tiempo libre.",
-  "about_body": "Streak nació de una idea simple: ¿por qué pagar por seguir tus propios hábitos?\n\nEsta app es completamente de código abierto. Cualquiera puede ver exactamente cómo funciona, proponer mejoras, o incluso crear su propia versión. Sin cajas negras. Sin sorpresas.\n\nTu privacidad es total — todo queda en tu teléfono. Sin cuentas, sin servidores, sin anuncios. Ni un solo dato sale de tu dispositivo.\n\nSin límites. Crea todos los hábitos que quieras. Sin suscripciones, sin \"versión pro\", sin pop-ups pidiéndote que pagues. Nunca.\n\nSi la app te aporta algo, puedes apoyarla con una estrella en GitHub o invitándome a un café. Pero es completamente opcional — la app es tuya igual.",
+  "about_body": "Flash nació de una idea simple: ¿por qué pagar por seguir tus propios hábitos?\n\nEsta app es completamente de código abierto. Cualquiera puede ver exactamente cómo funciona, proponer mejoras, o incluso crear su propia versión. Sin cajas negras. Sin sorpresas.\n\nTu privacidad es total — todo queda en tu teléfono. Sin cuentas, sin servidores, sin anuncios. Ni un solo dato sale de tu dispositivo.\n\nSin límites. Crea todos los hábitos que quieras. Sin suscripciones, sin \"versión pro\", sin pop-ups pidiéndote que pagues. Nunca.\n\nSi la app te aporta algo, puedes apoyarla con una estrella en GitHub o invitándome a un café. Pero es completamente opcional — la app es tuya igual.",
   "close": "Cerrar",
   "no_data_yet": "Aún no hay datos",
   "import_question_body": "¿Reemplazar todos tus hábitos actuales con la copia, o combinarlos?",
@@ -419,9 +443,9 @@
   "streak_on": "🔥 Llevas {n} días seguidos. ¡No lo rompas!",
   "streak_off": "💪 Hoy puedes empezar una nueva racha",
   "not_enough_data": "Aún no hay suficientes datos",
-  "about_inline": "Streak es una app de código abierto para seguir tus hábitos. Sin cuentas, sin límites, sin pagos. Todo queda en tu teléfono.\n\nCualquiera puede ver el código, mejorarlo o usarlo libremente.",
+  "about_inline": "Flash es una app de código abierto para seguir tus hábitos. Sin cuentas, sin límites, sin pagos. Todo queda en tu teléfono.\n\nCualquiera puede ver el código, mejorarlo o usarlo libremente.",
   "about_subtitle": "Para los días en que eliges aparecer.",
-  "about_story": "Esta app nació de la frustración con las apps de hábitos del mercado. La mayoría te limitan el número de hábitos que puedes crear, meten funciones básicas detrás de un muro de pago, te rastrean o te bombardean con anuncios. Así que decidí crear Streak: completamente gratuita, sin anuncios, sin pagos, sin tracking. Todo el trabajo es local — tus datos son tuyos. Código abierto, sin trampa.",
+  "about_story": "Esta app nació de la frustración con las apps de hábitos del mercado. La mayoría te limitan el número de hábitos que puedes crear, meten funciones básicas detrás de un muro de pago, te rastrean o te bombardean con anuncios. Así que decidí crear Flash: completamente gratuita, sin anuncios, sin pagos, sin tracking. Todo el trabajo es local — tus datos son tuyos. Código abierto, sin trampa.",
   "made_by": "Hecho con ❤️ por @InlitX",
   "share": "Compartir",
   "share_progress": "Compartir progreso",
@@ -439,7 +463,7 @@
   "about_credits": "Créditos",
   "about_credits_body": "Hecho con Flutter. Iconos de Lucide. Gráficas con fl_chart. Tipografías Figtree y Playfair Display.",
   "dev_handle": "@InlitX",
-  "dev_role": "Creador indie · Streak",
+  "dev_role": "Creador indie · Flash",
   "notes": "Notas",
   "notes_enable_sub": "Añade notas a cualquier día de un hábito",
   "add_note": "Añadir nota",
@@ -751,9 +775,9 @@
   "vacation_day_off": "Quitar día de vacaciones",
   "rest_days": "Días de descanso",
   "rest_days_desc": "Pausa el hábito cada semana en estos días. Puedes registrarlos igual y contarán.",
-  "widget_no_habits": "Sin hábitos aún\nToca para abrir Streak",
-  "widget_no_data": "Sin datos aún\nAbre Streak para sincronizar",
-  "widget_open_to_sync": "Abre Streak para sincronizar",
+  "widget_no_habits": "Sin hábitos aún\nToca para abrir Flash",
+  "widget_no_data": "Sin datos aún\nAbre Flash para sincronizar",
+  "widget_open_to_sync": "Abre Flash para sincronizar",
   "widget_activity": "Actividad",
   "widget_today_progress": "Hoy  {done}/{total}",
   "widget_todos_open": "Tareas  {count}",
@@ -843,11 +867,19 @@
   "period_last_year": "El año pasado",
   "period_week_of": "Semana del {date}",
   "@period_week_of": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "focus_period_sessions": "{count, plural, =0{Sin sesiones} =1{1 sesión} other{{count} sesiones}}",
   "@focus_period_sessions": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "notes_all": "Todas las notas",
   "notes_empty_all": "Todavía no hay notas",
@@ -959,13 +991,25 @@
   "last_check": "Última marca",
   "check_history": "Historial de marcas",
   "check_history_sub": "{count} días marcados",
-  "@check_history_sub": {"placeholders": {"count": {"type": "String"}}},
+  "@check_history_sub": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "check_never": "Nunca",
   "check_no_time": "sin hora guardada",
   "heatmap_rolling": "Últimos 12 meses",
   "heatmap_rolling_sub": "La rejilla anual acaba hoy en vez del 31 de diciembre",
   "check_marks": "{count} marcas",
-  "@check_marks": {"placeholders": {"count": {"type": "String"}}},
+  "@check_marks": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "today_progress_option": "Progreso en Hoy",
   "today_progress_option_sub": "El anillo del día y la barra de fuerza de cada hábito",
   "quiet_when_done": "Silencio al cumplir",
@@ -986,7 +1030,7 @@
   "pin_wrong": "PIN incorrecto",
   "pin_wait": "Demasiados intentos. Espera {seconds} s",
   "pin_recovery_title": "Tu código de recuperación",
-  "pin_recovery_body": "Si olvidas el PIN, este código abre Streak y quita el bloqueo. Guárdalo en un sitio seguro: no se volverá a mostrar.",
+  "pin_recovery_body": "Si olvidas el PIN, este código abre Flash y quita el bloqueo. Guárdalo en un sitio seguro: no se volverá a mostrar.",
   "pin_copy": "Copiar código",
   "pin_copied": "Código copiado",
   "pin_forgot": "¿Has olvidado el PIN?",

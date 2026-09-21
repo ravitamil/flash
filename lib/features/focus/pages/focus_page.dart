@@ -34,6 +34,8 @@ import 'package:streak/features/focus/widgets/timer_clocks.dart';
 import 'package:streak/features/habits/data/habit.dart';
 import 'package:streak/features/habits/state/habits_controller.dart';
 import 'package:streak/features/settings/state/settings_controller.dart';
+import 'package:streak/features/todos/data/todo.dart';
+import 'package:streak/features/todos/state/todos_controller.dart';
 import 'package:streak/services/notification_service.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -43,11 +45,13 @@ class FocusPage extends StatefulWidget implements FullWidthPage {
     this.startHabitId,
     this.startMinutes,
     this.breakMinutes,
+    this.startTodo,
   });
 
   final String? startHabitId;
   final int? startMinutes;
   final int? breakMinutes;
+  final Todo? startTodo;
 
   static const routeName = 'focus';
 
@@ -73,7 +77,7 @@ class _FocusPageState extends State<FocusPage> {
     if (context.read<SettingsController>().focusKeepAwake) {
       WakelockPlus.enable();
     }
-    if (widget.startMinutes != null) {
+    if (widget.startTodo != null || widget.startMinutes != null) {
       _leadValue = 3;
       _begin();
     }
@@ -82,10 +86,15 @@ class _FocusPageState extends State<FocusPage> {
   Future<void> _begin() async {
     await NotificationService().requestNotifications();
     if (!mounted) return;
+    final todo = widget.startTodo;
+    final targetMins = widget.startMinutes ??
+        (todo != null && todo.durationMinutes != null && todo.durationMinutes! > 0
+            ? todo.durationMinutes!
+            : 25);
     _runLead(() {
       _focus.start(
         habitId: widget.startHabitId ?? '',
-        targetMinutes: widget.startMinutes!,
+        targetMinutes: targetMins,
         breakMinutes: widget.breakMinutes ?? 0,
       );
       unawaited(_startSavedTrack());
@@ -227,6 +236,7 @@ class _FocusPageState extends State<FocusPage> {
     final session = await focus.stop(completed: completed);
     await FocusAudio.stop();
     if (!mounted) return;
+    final todos = context.read<TodosController>();
 
     final target = habitId.isEmpty ? null : habits.byId(habitId);
     final today = AppClock.now();
@@ -238,6 +248,9 @@ class _FocusPageState extends State<FocusPage> {
         !target.isCompletedOn(today)) {
       habits.toggle(target.id, today, fromFocus: true);
     }
+    if (completed && widget.startTodo != null) {
+      await todos.toggle(widget.startTodo!.id);
+    }
     if (!mounted) return;
 
     if (session != null) {
@@ -247,6 +260,23 @@ class _FocusPageState extends State<FocusPage> {
       );
     }
     AppNavigator.pop();
+  }
+
+  void _openNotesSheet(Todo todo) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => _FocusNotesSheet(
+        todo: todo,
+        onNoteSaved: (note) async {
+          await context.read<TodosController>().appendNote(todo.id, note);
+          if (mounted) {
+            AppSnackbar.success(context, 'Note saved to ${todo.title}');
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -273,7 +303,7 @@ class _FocusPageState extends State<FocusPage> {
         .values[settings.focusClockStyle.clamp(0, ClockStyle.values.length - 1)];
     final label = focus.isBreak
         ? context.l10n.focus_break
-        : (habit?.name ?? context.l10n.focus);
+        : (widget.startTodo?.title ?? (habit?.name ?? context.l10n.focus));
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppTheme.systemBars(Brightness.dark),
@@ -312,6 +342,9 @@ class _FocusPageState extends State<FocusPage> {
                   builder: (context, _) => _TopBar(
                     immersive: _immersive,
                     onImmersive: _toggleImmersive,
+                    onNotes: widget.startTodo != null
+                        ? () => _openNotesSheet(widget.startTodo!)
+                        : null,
                     title: label,
                     target: leadMinutes <= 0
                         ? context.l10n.focus_flowtime
@@ -507,12 +540,14 @@ class _TopBar extends StatelessWidget {
     required this.target,
     required this.immersive,
     required this.onImmersive,
+    this.onNotes,
   });
 
   final String title;
   final String target;
   final bool immersive;
   final VoidCallback onImmersive;
+  final VoidCallback? onNotes;
 
   Future<void> _pickStyle(BuildContext context) async {
     final settings = context.read<SettingsController>();
@@ -796,6 +831,11 @@ class _TopBar extends StatelessWidget {
             icon: immersive ? LucideIcons.minimize2 : LucideIcons.maximize2,
             onTap: onImmersive,
           ),
+          if (onNotes != null)
+            _TopIcon(
+              icon: LucideIcons.notebookPen,
+              onTap: onNotes!,
+            ),
           _TopIcon(
             icon: LucideIcons.music,
             onTap: () => showMusicSheet(context),
@@ -1133,6 +1173,107 @@ class _LeadIn extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _FocusNotesSheet extends StatefulWidget {
+  const _FocusNotesSheet({
+    required this.todo,
+    required this.onNoteSaved,
+  });
+
+  final Todo todo;
+  final ValueChanged<String> onNoteSaved;
+
+  @override
+  State<_FocusNotesSheet> createState() => _FocusNotesSheetState();
+}
+
+class _FocusNotesSheetState extends State<_FocusNotesSheet> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, bottomInset + 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.notebookPen, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Notes · ${widget.todo.title}',
+                  style: sheetTitleStyle(context, size: 17),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          if (widget.todo.body.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 120),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SingleChildScrollView(
+                child: Text(
+                  widget.todo.body,
+                  style: sheetBodyStyle(context, size: 13.5),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            minLines: 3,
+            maxLines: 6,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(
+              hintText: 'Add notes, details, or ideas...',
+              hintStyle: sheetBodyStyle(context, size: 14),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.all(12),
+            ),
+          ),
+          const SizedBox(height: 14),
+          ElevatedButton.icon(
+            icon: const Icon(LucideIcons.save, size: 16),
+            label: Text(
+              'Save Note to Task',
+              style: sheetActionStyle(context, size: 14),
+            ),
+            onPressed: () {
+              final text = _controller.text.trim();
+              if (text.isNotEmpty) {
+                widget.onNoteSaved(text);
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
       ),
     );
   }

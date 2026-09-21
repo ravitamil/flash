@@ -158,11 +158,11 @@ class _SharePageState extends State<SharePage> {
       if (!await Gal.hasAccess(toAlbum: true)) {
         await Gal.requestAccess(toAlbum: true);
       }
-      await Gal.putImageBytes(bytes, album: 'Streak');
+      await Gal.putImageBytes(bytes, album: 'Flash');
       return true;
     }
     final path = await FilePicker.platform.saveFile(
-      fileName: 'streak_${widget.habit.id}.png',
+      fileName: 'flash_${widget.habit.id}.png',
       type: FileType.custom,
       allowedExtensions: const ['png'],
     );

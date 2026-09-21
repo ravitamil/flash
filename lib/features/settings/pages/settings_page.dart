@@ -16,7 +16,6 @@ import 'package:streak/features/settings/pages/about_page.dart';
 import 'package:streak/features/settings/pages/app_style_page.dart';
 import 'package:streak/features/settings/pages/archived_habits_page.dart';
 import 'package:streak/features/settings/pages/express_settings_page.dart';
-import 'package:streak/features/settings/pages/minimal_settings_page.dart';
 import 'package:streak/features/settings/pages/quotes_page.dart';
 import 'package:streak/features/settings/settings_actions.dart';
 import 'package:streak/features/settings/state/settings_controller.dart';
@@ -31,9 +30,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsController>();
     if (settings.isExpressStyle) return const ExpressSettingsPage();
-    return settings.isMinimalStyle
-        ? const MinimalSettingsPage()
-        : const ClassicSettingsPage();
+    return const ClassicSettingsPage();
   }
 }
 
@@ -65,7 +62,6 @@ class ClassicSettingsPage extends StatelessWidget {
                 icon: LucideIcons.smartphone,
                 title: context.l10n.app_style,
                 value: switch (settings.appStyle) {
-                  1 => context.l10n.style_minimal,
                   2 => context.l10n.style_express,
                   _ => context.l10n.style_classic,
                 },
@@ -213,23 +209,6 @@ class _ClassicAppearancePage extends StatelessWidget {
             onChanged: settings.setCheckStyle,
           ),
         ),
-        if (hasAppIcons) ...[
-          settingsDivider(context),
-          SettingRow(
-            icon: LucideIcons.appWindow,
-            title: context.l10n.app_icon,
-            subtitle: context.l10n.app_icon_sub,
-            trailing: Segmented(
-              options: [
-                context.l10n.icon_default,
-                context.l10n.icon_neutral,
-                context.l10n.icon_accent,
-              ],
-              index: settings.appIcon,
-              onChanged: settings.setAppIcon,
-            ),
-          ),
-        ],
       ],
     );
   }

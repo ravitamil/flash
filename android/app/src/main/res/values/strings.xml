@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Streak</string>
+    <string name="app_name">Flash</string>
     <string name="widget_description">Track your habits and build streaks</string>
-    <string name="widget_heatmap_label">Streak heatmap</string>
-    <string name="widget_habit_label">Streak habits</string>
-    <string name="widget_today_label">Streak today</string>
-    <string name="widget_stats_label">Streak summary</string>
-    <string name="widget_todos_label">Streak to-do</string>
+    <string name="widget_heatmap_label">Flash heatmap</string>
+    <string name="widget_habit_label">Flash habits</string>
+    <string name="widget_today_label">Flash today</string>
+    <string name="widget_stats_label">Flash summary</string>
+    <string name="widget_todos_label">Flash to-do</string>
     <string name="widget_todos_description">See what is left to do today</string>
 </resources>

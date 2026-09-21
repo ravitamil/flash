@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.streak.app"
+    namespace = "com.flash.app"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -31,7 +31,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.streak.app"
+        applicationId = "com.flash.app"
         minSdk = 28
         targetSdk = 36
         versionCode = flutter.versionCode

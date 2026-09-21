@@ -7,6 +7,7 @@ import 'package:streak/features/habits/pages/day_timeline_page.dart';
 import 'package:streak/features/habits/pages/home_page.dart';
 import 'package:streak/features/habits/state/habits_controller.dart';
 import 'package:streak/features/habits/widgets/day_timeline_parts.dart';
+import 'package:streak/features/todos/state/todos_controller.dart';
 
 import 'support/app_harness.dart';
 
@@ -189,5 +190,73 @@ void main() {
     final block = tester.widget<TimelineBlock>(find.byType(TimelineBlock));
     expect(block.done, isFalse);
     expect(find.byIcon(LucideIcons.calendarCheck), findsOneWidget);
+  });
+
+  testWidgets(
+      'timeline displays both habits and todos chronologically with gaps',
+      (tester) async {
+    final today = AppClock.now();
+    await seedHabits(tester, [
+      testHabit(
+        id: 'h1',
+        name: 'Morning Habit',
+        startMinute: 8 * 60,
+        durationMinutes: 30,
+      ),
+    ]);
+    await seedTodos(tester, [
+      testTodo(
+        id: 't1',
+        text: 'Review PR',
+        due: today,
+        minutes: 9 * 60 + 30,
+      ),
+      testTodo(
+        id: 't2',
+        text: 'Call plumber',
+        due: today,
+      ),
+    ]);
+    await pumpScreen(tester, const DayTimelinePage());
+
+    expect(find.byType(TimelineBlock), findsOneWidget);
+    expect(find.byType(TimelineTodoBlock), findsOneWidget);
+    expect(find.text('Morning Habit'), findsOneWidget);
+    expect(find.text('Review PR'), findsOneWidget);
+    expect(find.text('Call plumber'), findsOneWidget);
+  });
+
+  testWidgets('toggling todo from timeline updates completion',
+      (tester) async {
+    final today = AppClock.now();
+    await seedTodos(tester, [
+      testTodo(
+        id: 't1',
+        text: 'Team Sync',
+        due: today,
+        minutes: 10 * 60,
+        done: false,
+      ),
+    ]);
+    await pumpScreen(tester, const DayTimelinePage());
+
+    expect(find.byType(TimelineTodoBlock), findsOneWidget);
+    final todoController = Provider.of<TodosController>(
+      tester.element(find.byType(DayTimelinePage)),
+      listen: false,
+    );
+    expect(todoController.byId('t1')!.done, isFalse);
+
+    await tester.runAsync(() => tester.tap(find.byType(TimelineTodoCheck)));
+    await _waitFor(
+      tester,
+      () => todoController.byId('t1')!.done,
+    );
+
+    expect(todoController.byId('t1')!.done, isTrue);
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 800)),
+    );
+    await tester.pumpAndSettle();
   });
 }

@@ -20,9 +20,8 @@ class AppStylePicker extends StatelessWidget {
     }
 
     final options = [
-      (context.l10n.style_classic, const _ClassicSkeleton()),
-      (context.l10n.style_minimal, const _MinimalSkeleton()),
-      (context.l10n.style_express, const _ExpressSkeleton()),
+      (0, context.l10n.style_classic, const _ClassicSkeleton()),
+      (2, context.l10n.style_express, const _ExpressSkeleton()),
     ];
 
     return Row(
@@ -34,10 +33,10 @@ class AppStylePicker extends StatelessWidget {
           SizedBox(
             width: width,
             child: _StyleOption(
-              label: options[i].$1,
-              selected: settings.appStyle == i,
-              preview: options[i].$2,
-              onTap: () => choose(i),
+              label: options[i].$2,
+              selected: settings.appStyle == options[i].$1,
+              preview: options[i].$3,
+              onTap: () => choose(options[i].$1),
             ),
           ),
         ],
@@ -151,9 +150,8 @@ class AppStyleLegend extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsController>();
     final rows = [
-      (context.l10n.style_classic, context.l10n.style_classic_desc),
-      (context.l10n.style_minimal, context.l10n.style_minimal_desc),
-      (context.l10n.style_express, context.l10n.style_express_desc),
+      (0, context.l10n.style_classic, context.l10n.style_classic_desc),
+      (2, context.l10n.style_express, context.l10n.style_express_desc),
     ];
 
     return Column(
@@ -163,12 +161,12 @@ class AppStyleLegend extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(bottom: i == rows.length - 1 ? 0 : 8),
             child: _LegendRow(
-              title: rows[i].$1,
-              description: rows[i].$2,
-              selected: settings.appStyle == i,
+              title: rows[i].$2,
+              description: rows[i].$3,
+              selected: settings.appStyle == rows[i].$1,
               onTap: () {
-                if (settings.appStyle == i) return;
-                settings.setAppStyle(i);
+                if (settings.appStyle == rows[i].$1) return;
+                settings.setAppStyle(rows[i].$1);
               },
             ),
           ),
@@ -407,96 +405,6 @@ class _ClassicSkeleton extends StatelessWidget {
   }
 }
 
-class _MinimalSkeleton extends StatelessWidget {
-  const _MinimalSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    final skin = _Skin(
-      context,
-      context.colors.primary,
-      Theme.of(context).brightness == Brightness.dark,
-    );
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final s = constraints.maxWidth / 86;
-
-        Widget wideCard() => Container(
-              height: 22 * s,
-              padding: EdgeInsets.symmetric(horizontal: 5 * s),
-              decoration: BoxDecoration(
-                color: skin.isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.white.withValues(alpha: 0.75),
-                borderRadius: BorderRadius.circular(7 * s),
-                border: Border.all(color: skin.faint.withValues(alpha: 0.35)),
-              ),
-              child: Row(
-                children: [
-                  _block(13 * s, 13 * s, skin.tint, radius: 4.5 * s),
-                  SizedBox(width: 5 * s),
-                  _block(16 * s, 3.2 * s, skin.text, radius: 2 * s),
-                  const Spacer(),
-                  for (var i = 0; i < 4; i++) ...[
-                    if (i > 0) SizedBox(width: 2.5 * s),
-                    _block(
-                      5 * s,
-                      9 * s,
-                      i == 3 ? skin.accent : skin.tint,
-                      radius: 1.8 * s,
-                    ),
-                  ],
-                ],
-              ),
-            );
-
-        return Padding(
-          padding: EdgeInsets.fromLTRB(5 * s, 7 * s, 5 * s, 6 * s),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  _block(8 * s, 8 * s, skin.faint, radius: 2.5 * s),
-                  const Spacer(),
-                  _block(8 * s, 8 * s, skin.faint, radius: 2.5 * s),
-                  SizedBox(width: 4 * s),
-                  _block(8 * s, 8 * s, skin.text, radius: 4 * s),
-                ],
-              ),
-              SizedBox(height: 8 * s),
-              wideCard(),
-              SizedBox(height: 5 * s),
-              wideCard(),
-              SizedBox(height: 5 * s),
-              wideCard(),
-              const Spacer(),
-              Center(
-                child: Container(
-                  width: 34 * s,
-                  height: 11 * s,
-                  decoration: BoxDecoration(
-                    color: skin.card,
-                    borderRadius: BorderRadius.circular(6 * s),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _block(5 * s, 5 * s, skin.accent, radius: 2.5 * s),
-                      _block(5 * s, 5 * s, skin.faint, radius: 2.5 * s),
-                      _block(5 * s, 5 * s, skin.faint, radius: 2.5 * s),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
 
 class _ExpressSkeleton extends StatelessWidget {
   const _ExpressSkeleton();

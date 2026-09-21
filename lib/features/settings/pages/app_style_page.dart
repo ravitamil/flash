@@ -14,7 +14,7 @@ class AppStylePage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final width =
-              ((constraints.maxWidth - 44 - 32) / 3).clamp(80.0, 150.0);
+              ((constraints.maxWidth - 44 - 20) / 2).clamp(100.0, 160.0);
           return ListView(
             padding: context.pagePadding(22, 0, 22, 40),
             children: [

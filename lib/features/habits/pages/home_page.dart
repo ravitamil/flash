@@ -260,6 +260,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final hasHabits = context.watch<HabitsController>().habits.isNotEmpty;
     final settings = context.watch<SettingsController>();
     final order = context.watch<CategoriesController>().categories;
     final sortCompletedLast = settings.sortCompletedLast;
@@ -267,21 +268,7 @@ class _HomePageState extends State<HomePage> {
     final express = settings.isExpressStyle;
     final wide = isWideLayout(context);
     final railed = minimal && wide;
-    final bigText = MediaQuery.textScalerOf(context).scale(14) > 20;
     return Scaffold(
-      floatingActionButton: express && !_reordering
-          ? Padding(
-              padding: EdgeInsets.only(bottom: wide ? 0 : 74),
-              child: ExpressFab(
-                icon: LucideIcons.plus,
-                label: context.l10n.add_habit,
-                onPressed: () => AppNavigator.push(
-                  const HabitFormPage(),
-                  fullscreenDialog: true,
-                ),
-              ),
-            )
-          : null,
       appBar: AppBar(
         title: _reordering
             ? Text(context.l10n.reorder)
@@ -341,59 +328,22 @@ class _HomePageState extends State<HomePage> {
               icon: const Icon(LucideIcons.chartColumn),
               onPressed: () => AppNavigator.push(const StatisticsPage()),
             ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _reordering
-                ? FilledButton.icon(
-                    onPressed: () => setState(() => _reordering = false),
-                    icon: const Icon(LucideIcons.check, size: 18),
-                    label: Text(context.l10n.done),
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  )
-                : express
-                    ? const SizedBox.shrink()
-                    : minimal || bigText
-                    ? IconButton(
-                        onPressed: () => AppNavigator.push(
-                          const HabitFormPage(),
-                          fullscreenDialog: true,
-                        ),
-                        icon: Icon(
-                          LucideIcons.circlePlus,
-                          size: 26,
-                          color: context.colors.onSurface,
-                        ),
-                      )
-                    : FilledButton.icon(
-                        onPressed: () => AppNavigator.push(
-                          const HabitFormPage(),
-                          fullscreenDialog: true,
-                        ),
-                        icon: const Icon(LucideIcons.plus, size: 16),
-                        label: Text(
-                          context.l10n.new_label,
-                          style: const TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                      ),
-          ),
+          if (_reordering)
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: FilledButton.icon(
+                onPressed: () => setState(() => _reordering = false),
+                icon: const Icon(LucideIcons.check, size: 18),
+                label: Text(context.l10n.done),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            )
+          else
+            const SizedBox(width: 12),
         ],
       ),
       body: Stack(
@@ -565,6 +515,27 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          if (hasHabits && !_reordering)
+            Positioned(
+              right: (minimal ? 20 : 16) + context.safeInsets.right,
+              bottom: (wide ? (minimal ? 20 : 16) : (minimal ? 20 : 82)) +
+                  context.bottomInset,
+              child: express
+                  ? ExpressFab(
+                      icon: LucideIcons.plus,
+                      label: context.l10n.add_habit,
+                      onPressed: () => AppNavigator.push(
+                        const HabitFormPage(),
+                        fullscreenDialog: true,
+                      ),
+                    )
+                  : HabitAddButton(
+                      onTap: () => AppNavigator.push(
+                        const HabitFormPage(),
+                        fullscreenDialog: true,
+                      ),
+                    ),
+            ),
         ],
       ),
     );
@@ -915,3 +886,46 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
+
+class HabitAddButton extends StatelessWidget {
+  const HabitAddButton({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final minimal = context.watch<SettingsController>().isMinimalStyle;
+    return Semantics(
+      button: true,
+      label: context.l10n.add_habit,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: minimal ? scheme.onSurface : scheme.primary,
+            shape: minimal ? BoxShape.rectangle : BoxShape.circle,
+            borderRadius: minimal ? BorderRadius.circular(19) : null,
+            boxShadow: minimal
+                ? null
+                : [
+                    BoxShadow(
+                      color: scheme.primary.withValues(alpha: 0.34),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+          ),
+          child: Icon(
+            LucideIcons.plus,
+            size: 24,
+            color: minimal ? scheme.surface : scheme.onPrimary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+

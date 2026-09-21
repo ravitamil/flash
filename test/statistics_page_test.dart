@@ -55,15 +55,19 @@ void main() {
     expect(find.byType(HabitDonut), findsOneWidget);
   });
 
-  testWidgets('minimal keeps the heatmap and drops the extra charts',
+  testWidgets('can switch to Tasks statistics and view task metrics',
       (tester) async {
     await _seedTwo(tester);
-    await pumpScreen(tester, const StatisticsPage(), minimal: true);
+    await pumpScreen(tester, const StatisticsPage());
 
-    expect(find.text('Statistics'), findsOneWidget);
-    expect(find.byType(YearHeatmap), findsOneWidget);
-    await scrollToEnd(tester);
-    expect(find.byType(HabitDonut), findsNothing);
+    expect(find.text('Habits'), findsOneWidget);
+    expect(find.text('Tasks'), findsOneWidget);
+
+    await tester.tap(find.text('Tasks'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Completed (2026)'), findsNothing); // empty tasks
+    expect(find.text('No tasks yet'), findsOneWidget);
   });
 
   testWidgets('the year heatmap opens on the current month', (tester) async {

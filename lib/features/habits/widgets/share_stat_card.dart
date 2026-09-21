@@ -112,7 +112,7 @@ class ShareStatCard extends StatelessWidget {
                       ),
                       SizedBox(width: width * 0.025),
                       Text(
-                        'Streak',
+                        'Flash',
                         style: TextStyle(
                           fontFamily: 'PlayfairDisplay',
                           fontStyle: FontStyle.italic,

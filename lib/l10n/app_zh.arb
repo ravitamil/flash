@@ -205,9 +205,21 @@
     }
   },
   "every_n_weeks": "每 {n} 周",
-  "@every_n_weeks": {"placeholders": {"n": {"type": "int"}}},
+  "@every_n_weeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "every_n_months": "每 {n} 个月",
-  "@every_n_months": {"placeholders": {"n": {"type": "int"}}},
+  "@every_n_months": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "sched_unit_days": "天",
   "sched_unit_weeks": "周",
   "sched_unit_months": "月",
@@ -235,11 +247,23 @@
   "todo_tag_folders": "文件夹",
   "todo_tag_list": "列表",
   "todo_tag_count": "{n} 项待办",
-  "@todo_tag_count": {"placeholders": {"n": {"type": "int"}}},
+  "@todo_tag_count": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "todo_tag_icon": "图标",
   "todo_tag_pick": "选择标签",
   "todo_tag_filtered": "按 {name} 筛选",
-  "@todo_tag_filtered": {"placeholders": {"name": {"type": "String"}}},
+  "@todo_tag_filtered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "uncategorized": "未分类",
   "more_icons": "更多图标",
   "less_icons": "精简图标",
@@ -263,7 +287,7 @@
   "view_source": "在 GitHub 查看源代码",
   "about_title": "为你而生，永久免费。",
   "about_footer": "由☕与大量闲暇时光打磨而成。",
-  "about_body": "Streak 诞生于一个简单的想法：为什么要为记录自己的习惯付费？\n\n这款应用完全开源。任何人都能看清它的运作方式、提出改进建议，甚至打造自己的版本。没有黑箱，没有意外。\n\n你的隐私绝对完整 — 一切数据都保存在你的手机上。无需账号，没有服务器，没有广告。连一个字节都不会离开你的设备。\n\n毫无限制。想创建多少习惯都行。没有订阅，没有 \"专业版\"，没有弹窗催你付费。永远不会。\n\n如果这款应用对你有所帮助，你可以在 GitHub 上点颗星，或是请我喝杯咖啡来支持它。但这完全自愿 —— 无论如何，应用都属于你。",
+  "about_body": "Flash 诞生于一个简单的想法：为什么要为记录自己的习惯付费？\n\n这款应用完全开源。任何人都能看清它的运作方式、提出改进建议，甚至打造自己的版本。没有黑箱，没有意外。\n\n你的隐私绝对完整 — 一切数据都保存在你的手机上。无需账号，没有服务器，没有广告。连一个字节都不会离开你的设备。\n\n毫无限制。想创建多少习惯都行。没有订阅，没有 \"专业版\"，没有弹窗催你付费。永远不会。\n\n如果这款应用对你有所帮助，你可以在 GitHub 上点颗星，或是请我喝杯咖啡来支持它。但这完全自愿 —— 无论如何，应用都属于你。",
   "close": "关闭",
   "no_data_yet": "暂无数据",
   "import_question_body": "使用备份覆盖现有所有习惯，还是将两者合并？",
@@ -333,9 +357,9 @@
   },
   "streak_off": "💪 今天，开启你的新连胜吧",
   "not_enough_data": "暂无足够数据",
-  "about_inline": "Streak 是一款用于追踪习惯的开源应用。无需注册账号、没有功能限制、无需付费。所有数据仅保存在你的手机本地。\n\n任何人都可以查看源代码、进行优化，或是自由使用。",
+  "about_inline": "Flash 是一款用于追踪习惯的开源应用。无需注册账号、没有功能限制、无需付费。所有数据仅保存在你的手机本地。\n\n任何人都可以查看源代码、进行优化，或是自由使用。",
   "about_subtitle": "致你全力以赴的每一天。",
-  "about_story": "开发这款应用，源于我对市面上各类习惯追踪软件的不满。大多数应用会限制可创建的习惯数量，把基础功能设为付费内容、收集用户数据，或是充斥大量广告。于是我打造了 Streak：完全免费、无广告、无需付费、不追踪用户信息。所有数据本地运行，你的数据全权归你所有。开源软件，无任何隐藏套路。",
+  "about_story": "开发这款应用，源于我对市面上各类习惯追踪软件的不满。大多数应用会限制可创建的习惯数量，把基础功能设为付费内容、收集用户数据，或是充斥大量广告。于是我打造了 Flash：完全免费、无广告、无需付费、不追踪用户信息。所有数据本地运行，你的数据全权归你所有。开源软件，无任何隐藏套路。",
   "made_by": "由 @InlitX 用❤️制作",
   "share": "分享",
   "share_progress": "分享进度",
@@ -344,7 +368,7 @@
   "about_credits": "致谢",
   "about_credits_body": "基于 Flutter 开发。图标源自 Lucide。图表组件使用 fl_chart。字体采用 Figtree 与 Playfair Display。",
   "dev_handle": "@InlitX",
-  "dev_role": "独立开发者・Streak",
+  "dev_role": "独立开发者・Flash",
   "check_style": "查看样式",
   "square": "方形",
   "circle": "圆形",
@@ -546,14 +570,14 @@
   "share_stats_short": "统计",
   "share_save": "保存",
   "app_style_sub": "选择应用的整体外观与风格。",
-  "app_lock_sub": "使用指纹或面容解锁 Streak",
+  "app_lock_sub": "使用指纹或面容解锁 Flash",
   "auto_backup_daily": "每日",
   "restore": "恢复",
   "preferences_sub": "语言、星期与排序",
   "auto_backup_no_permission": "存储权限被拒绝",
   "focus_built_in": "已包含",
   "unit_hour_short": "小时",
-  "widget_no_habits": "暂无习惯\n点击打开 Streak",
+  "widget_no_habits": "暂无习惯\n点击打开 Flash",
   "focus_sound": "声音",
   "add_note": "添加笔记",
   "share_photo": "照片",
@@ -656,7 +680,7 @@
   "widget_cfg_dot_color": "圆点颜色",
   "widget_cfg_style_card": "卡片",
   "focus_target_reached": "目标已达成",
-  "share_friends_message": "我用 Streak 保持习惯连续打卡——一款小巧、免费、无需账号、无广告的离线习惯追踪器。快来创建你的习惯：https://inlitx.github.io/streak/",
+  "share_friends_message": "我用 Flash 保持习惯连续打卡——一款小巧、免费、无需账号、无广告的离线习惯追踪器。快来创建你的习惯：https://inlitx.github.io/streak/",
   "note_kind_completed": "已完成",
   "focus_break": "休息",
   "widget_cfg_choose_image": "选择图片",
@@ -767,7 +791,7 @@
   "share_size_small": "方形",
   "yesterday": "昨日",
   "focus_resume": "继续",
-  "app_lock_title": "Streak 已锁定",
+  "app_lock_title": "Flash 已锁定",
   "archived_habits": "已归档习惯",
   "restored": "习惯已恢复",
   "see_less": "收起",
@@ -780,7 +804,7 @@
   "focus_pick_audio": "从手机选择音频",
   "notif_action_done": "已完成",
   "focus_history_empty_sub": "你完成的每次专注记录都会显示在这里。",
-  "widget_no_data": "暂无数据\n打开 Streak 进行同步",
+  "widget_no_data": "暂无数据\n打开 Flash 进行同步",
   "auto_backup_sub": "关闭",
   "best_month": "最佳月份",
   "share_save_failed": "无法保存图片",
@@ -864,7 +888,7 @@
   "focus_paused": "已暂停",
   "app_lock_unavailable": "此手机未设置生物识别",
   "auto_backup_folder_set": "文件夹已保存",
-  "widget_open_to_sync": "打开 Streak 进行同步",
+  "widget_open_to_sync": "打开 Flash 进行同步",
   "archive_habit": "归档习惯",
   "focus_track_limit": "最多 10 首音频",
   "style_minimal_desc": "习惯网格和设置被分为四个板块。",
@@ -1091,7 +1115,7 @@
   "pin_wrong": "PIN 错误",
   "pin_wait": "尝试次数过多，请等待 {seconds} 秒",
   "pin_recovery_title": "恢复码",
-  "pin_recovery_body": "忘记 PIN 时，此恢复码可打开 Streak 并关闭锁定。请妥善保存：它不会再次显示。",
+  "pin_recovery_body": "忘记 PIN 时，此恢复码可打开 Flash 并关闭锁定。请妥善保存：它不会再次显示。",
   "pin_copy": "复制恢复码",
   "pin_copied": "已复制",
   "pin_forgot": "忘记 PIN？",

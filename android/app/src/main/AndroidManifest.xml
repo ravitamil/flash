@@ -26,7 +26,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
     <application
-        android:label="Streak"
+        android:label="Flash"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -34,7 +34,7 @@
              packaging never strips it. It is otherwise only resolved by name at
              runtime (getIdentifier), which the build treats as unused. -->
         <meta-data
-            android:name="com.streak.app.notification_icon"
+            android:name="com.flash.app.notification_icon"
             android:resource="@drawable/ic_stat_notify" />
 
         <activity
@@ -50,48 +50,11 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
-
-        <!-- Launcher icon variants. Exactly one alias is enabled at a time;
-             switching is done at runtime via the streak/app_icon channel. -->
-        <activity-alias
-            android:name=".MainActivityDefault"
-            android:targetActivity=".MainActivity"
-            android:enabled="true"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="Streak">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:name=".MainActivityNeutral"
-            android:targetActivity=".MainActivity"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher_neutral"
-            android:label="Streak">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:name=".MainActivityAccent"
-            android:targetActivity=".MainActivity"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher_accent"
-            android:label="Streak">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity-alias>
 
         <meta-data
             android:name="flutterEmbedding"
@@ -126,7 +89,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.streak.app.UPDATE_WIDGET" />
+                <action android:name="com.flash.app.UPDATE_WIDGET" />
                 <action android:name="es.antonborri.home_widget.action.UPDATE_WIDGET" />
             </intent-filter>
             <meta-data
@@ -200,7 +163,7 @@
             android:name=".WidgetRefreshReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.streak.app.WIDGET_MIDNIGHT" />
+                <action android:name="com.flash.app.WIDGET_MIDNIGHT" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -212,7 +175,7 @@
             android:name=".WidgetActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.streak.app.TOGGLE_HABIT" />
+                <action android:name="com.flash.app.TOGGLE_HABIT" />
             </intent-filter>
         </receiver>
 

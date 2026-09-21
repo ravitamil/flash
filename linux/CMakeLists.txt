@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(runner LANGUAGES CXX)
 
-set(BINARY_NAME "Streak")
-set(APPLICATION_ID "com.streak.app")
+set(BINARY_NAME "Flash")
+set(APPLICATION_ID "com.flash.app")
 
 cmake_policy(SET CMP0063 NEW)
 
@@ -63,11 +63,11 @@ set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
 
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/com.streak.app.desktop"
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/com.flash.app.desktop"
   DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT Runtime)
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../assets/icon.png"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}" RENAME "com.streak.app.png"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}" RENAME "com.flash.app.png"
   COMPONENT Runtime)
 
 install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"

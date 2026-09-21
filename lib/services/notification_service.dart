@@ -119,8 +119,8 @@ class NotificationService {
       notificationCategories: _categories(await localizations()),
     );
     const windows = WindowsInitializationSettings(
-      appName: 'Streak',
-      appUserModelId: 'com.streak.app',
+      appName: 'Flash',
+      appUserModelId: 'com.flash.app',
       guid: 'cfb32a7d-9c06-495b-8afa-df8829d33edc',
     );
     final linux = LinuxInitializationSettings(

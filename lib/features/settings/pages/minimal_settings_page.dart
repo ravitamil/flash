@@ -303,29 +303,6 @@ class _AppearancePage extends StatelessWidget {
                 onSelected: settings.setCheckStyle,
               ),
             ),
-            if (hasAppIcons) ...[
-              SoftRow(
-                icon: LucideIcons.appWindow,
-                title: context.l10n.app_icon,
-                subtitle: context.l10n.app_icon_sub,
-                value: [
-                  context.l10n.icon_default,
-                  context.l10n.icon_neutral,
-                  context.l10n.icon_accent,
-                ][settings.appIcon],
-                onTap: () => showOptionSheet(
-                  context,
-                  title: context.l10n.app_icon,
-                  options: [
-                    context.l10n.icon_default,
-                    context.l10n.icon_neutral,
-                    context.l10n.icon_accent,
-                  ],
-                  index: settings.appIcon,
-                  onSelected: settings.setAppIcon,
-                ),
-              ),
-            ],
           ],
         ),
       ],

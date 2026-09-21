@@ -52,7 +52,7 @@ class BackupService {
 
   static String _payloadFor(List<Habit> habits) {
     final payload = {
-      'app': 'streak',
+      'app': 'flash',
       'version': _kBackupVersion,
       'exportedAt': DateTime.now().toIso8601String(),
       'habits': habits.map((h) => h.toMap()).toList(),
@@ -113,7 +113,7 @@ class BackupService {
     }
 
     final stamp = DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
-    final file = File('${dir.path}/streak_backup_$stamp.json');
+    final file = File('${dir.path}/flash_backup_$stamp.json');
     final habits = LocalStore.readHabits().values.toList();
     await file.writeAsString(_payloadFor(habits));
 
@@ -149,11 +149,11 @@ class BackupService {
   static Future<bool> export(List<Habit> habits, {Rect? origin}) async {
     final content = _payloadFor(habits);
     final stamp = DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
-    final name = 'streak_backup_$stamp.json';
+    final name = 'flash_backup_$stamp.json';
 
     if (!isMobile) {
       final path = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save your Streak backup',
+        dialogTitle: 'Save your Flash backup',
         fileName: name,
         type: FileType.custom,
         allowedExtensions: const ['json'],
@@ -163,13 +163,13 @@ class BackupService {
       return true;
     }
 
-    final dir = await Directory.systemTemp.createTemp('streak_backup');
+    final dir = await Directory.systemTemp.createTemp('flash_backup');
     final file = File('${dir.path}/$name');
     await file.writeAsString(content);
 
     final result = await Share.shareXFiles(
       [XFile(file.path, mimeType: 'application/json')],
-      subject: 'Streak backup',
+      subject: 'Flash backup',
       sharePositionOrigin: origin,
     );
     return result.status == ShareResultStatus.success ||
@@ -178,7 +178,7 @@ class BackupService {
 
   static Future<BackupData> read() async {
     final result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select a Streak backup file',
+      dialogTitle: 'Select a Flash backup file',
       type: FileType.any,
       withData: true,
     );
@@ -202,7 +202,7 @@ class BackupService {
     if (ImportService.looksLikeZip(bytes) ||
         ImportService.looksLikeSqlite(bytes)) {
       throw Exception(
-        'That is an export from another app, not a Streak backup. '
+        'That is an export from another app, not a Flash backup. '
         'Use "Import from another app" for it.',
       );
     }

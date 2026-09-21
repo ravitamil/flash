@@ -8,7 +8,6 @@ import 'package:streak/core/utils/cover_storage.dart';
 import 'package:streak/core/utils/money_format.dart';
 import 'package:streak/core/widgets/celebration_overlay.dart';
 import 'package:streak/features/focus/state/focus_audio.dart';
-import 'package:streak/services/app_icon_service.dart';
 import 'package:streak/services/backup_service.dart';
 import 'package:streak/services/home_widget_service.dart';
 
@@ -57,7 +56,6 @@ class SettingsController extends ChangeNotifier {
     _vacationAllIds =
         List<String>.from(LocalStore.setting('vacationAllIds', const <String>[]));
     _profilePhoto = LocalStore.setting('profilePhoto', '');
-    _appIcon = LocalStore.setting('appIcon', 0);
     _accentColor = LocalStore.setting('accentColor', AppPalette.brand.toARGB32());
     _heatmapMode = LocalStore.setting('heatmapMode', 0);
     _heatmapPath = LocalStore.setting('heatmapPath', false);
@@ -107,6 +105,10 @@ class SettingsController extends ChangeNotifier {
       'appStyle',
       LocalStore.setting('homeLayout', 0),
     );
+    if (_appStyle == 1) {
+      _appStyle = 0;
+      LocalStore.writeSetting('appStyle', 0);
+    }
     _celebration = CelebrationStyle.values[LocalStore.setting('celebration', 0)
         .clamp(0, CelebrationStyle.values.length - 1)];
     _appLock = LocalStore.setting('appLock', false);
@@ -135,7 +137,6 @@ class SettingsController extends ChangeNotifier {
   late bool _vacationAll;
   late List<String> _vacationAllIds;
   late String _profilePhoto;
-  late int _appIcon;
   late int _accentColor;
   late int _heatmapMode;
   late bool _heatmapPath;
@@ -223,8 +224,6 @@ class SettingsController extends ChangeNotifier {
 
   String get profileName => _profileName;
   String get profilePhoto => _profilePhoto;
-
-  int get appIcon => _appIcon;
 
   Color get accentColor => Color(_accentColor);
 
@@ -676,8 +675,10 @@ class SettingsController extends ChangeNotifier {
   bool get isExpressStyle => _appStyle == 2;
 
   Future<void> setAppStyle(int value) async {
-    _appStyle = value;
-    await LocalStore.writeSetting('appStyle', value);
+    final clean = value == 1 ? 0 : value;
+    if (_appStyle == clean) return;
+    _appStyle = clean;
+    await LocalStore.writeSetting('appStyle', clean);
     notifyListeners();
   }
 
@@ -739,13 +740,6 @@ class SettingsController extends ChangeNotifier {
     _profilePhoto = path;
     await LocalStore.writeSetting('profilePhoto', path);
     notifyListeners();
-  }
-
-  Future<void> setAppIcon(int index) async {
-    _appIcon = index;
-    await LocalStore.writeSetting('appIcon', index);
-    notifyListeners();
-    await AppIconService.apply(index);
   }
 
   Color get widgetBgColor => Color(_widgetBgColor);

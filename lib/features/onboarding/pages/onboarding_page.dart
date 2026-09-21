@@ -286,7 +286,7 @@ class _Welcome extends StatelessWidget {
         Text(l10n.onb_kicker.toUpperCase(), style: _kicker(context)),
         const SizedBox(height: 6),
         Text(
-          'Streak',
+          'Flash',
           style: TextStyle(
             fontSize: 46,
             height: 1,

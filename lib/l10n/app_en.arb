@@ -47,7 +47,14 @@
   "onb_yours_body": "Back it up or take it with you whenever you want.",
   "onb_step": "Step {step} of {total}",
   "@onb_step": {
-    "placeholders": { "step": { "type": "int" }, "total": { "type": "int" } }
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   },
   "statistics": "Statistics",
   "done_today": "Done today",
@@ -78,7 +85,7 @@
   "auto_backup_off": "Off",
   "auto_backup_daily": "Every day",
   "auto_backup_weekly": "Every week",
-  "auto_backup_where": "When you open the app, Streak writes a backup plus a readable copy of your habits you can open in any editor. The last 5 backups are kept.",
+  "auto_backup_where": "When you open the app, Flash writes a backup plus a readable copy of your habits you can open in any editor. The last 5 backups are kept.",
   "auto_backup_folder": "Folder",
   "auto_backup_folder_default": "App folder",
   "auto_backup_folder_set": "Folder saved",
@@ -96,9 +103,15 @@
   "import_from_app_done": "Imported {habits} habits ({days} days) from {source}",
   "@import_from_app_done": {
     "placeholders": {
-      "habits": { "type": "int" },
-      "days": { "type": "int" },
-      "source": { "type": "String" }
+      "habits": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      }
     }
   },
   "import_failed": "Couldn't import that file",
@@ -123,23 +136,43 @@
   "category_finance": "Finance",
   "count_days": "{count, plural, =1{1 day} other{{count} days}}",
   "@count_days": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "count_weeks": "{count, plural, =1{1 week} other{{count} weeks}}",
   "@count_weeks": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "count_months": "{count, plural, =1{1 month} other{{count} months}}",
   "@count_months": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "streak_unit_week": "{count}w",
   "@streak_unit_week": {
-    "placeholders": { "count": { "type": "String" } }
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   },
   "streak_unit_month": "{count}mo",
   "@streak_unit_month": {
-    "placeholders": { "count": { "type": "String" } }
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   },
   "habit_kind": "Habit type",
   "kind_positive": "Normal",
@@ -214,20 +247,24 @@
   "archive": "Archive",
   "share_friends": "Share with a friend",
   "share_friends_sub": "Send them the app",
-  "share_friends_message": "I'm keeping my streaks alive with Streak — a small, free, offline habit tracker with no accounts and no ads. Come build yours: https://inlitx.github.io/streak/",
+  "share_friends_message": "I'm keeping my streaks alive with Flash — a small, free, offline habit tracker with no accounts and no ads. Come build yours: https://inlitx.github.io/streak/",
   "copy_message": "Copy message",
   "message_copied": "Message copied",
   "app_lock": "App lock",
-  "app_lock_sub": "Ask for your fingerprint or face to open Streak",
+  "app_lock_sub": "Ask for your fingerprint or face to open Flash",
   "app_lock_unavailable": "This phone has no biometrics set up",
   "app_lock_failed": "Couldn't verify it was you",
-  "app_lock_title": "Streak is locked",
+  "app_lock_title": "Flash is locked",
   "app_lock_unlock": "Unlock",
   "app_lock_delay": "Lock after",
   "app_lock_delay_instant": "Immediately",
   "app_lock_delay_seconds": "{value} seconds",
   "@app_lock_delay_seconds": {
-    "placeholders": { "value": { "type": "String" } }
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
   },
   "note_photos": "Photos",
   "note_take_photo": "Camera",
@@ -235,13 +272,21 @@
   "journey": "Journey",
   "journey_sub": "{count, plural, =1{1 photo} other{{count} photos}}",
   "@journey_sub": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "journey_empty": "No photos yet",
   "journey_empty_sub": "Add a photo to a note and it shows up here.",
   "archive_habit_body": "Move \"{name}\" to the archive? Its history is kept and you can restore it from Settings.",
   "@archive_habit_body": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "archived_habits": "Archived habits",
   "archived_habits_sub": "Restore them or delete them for good",
@@ -252,7 +297,11 @@
   "delete_forever": "Delete for good",
   "delete_forever_body": "Delete \"{name}\" and all of its history? This cannot be undone.",
   "@delete_forever_body": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "deleted_forever": "Habit deleted",
   "clear_progress": "Clear progress",
@@ -272,7 +321,11 @@
   "day_start_midnight": "Midnight",
   "day_start_hour": "{hour}:00 AM",
   "@day_start_hour": {
-    "placeholders": { "hour": { "type": "String" } }
+    "placeholders": {
+      "hour": {
+        "type": "String"
+      }
+    }
   },
   "share_photo": "Photo",
   "share_stats_short": "Stats",
@@ -320,7 +373,9 @@
   "every_n_hours": "Every {n} h",
   "@every_n_hours": {
     "placeholders": {
-      "n": { "type": "String" }
+      "n": {
+        "type": "String"
+      }
     }
   },
   "repeat_weekly": "Specific days",
@@ -334,9 +389,21 @@
     }
   },
   "every_n_weeks": "Every {n} weeks",
-  "@every_n_weeks": {"placeholders": {"n": {"type": "int"}}},
+  "@every_n_weeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "every_n_months": "Every {n} months",
-  "@every_n_months": {"placeholders": {"n": {"type": "int"}}},
+  "@every_n_months": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "sched_unit_days": "Days",
   "sched_unit_weeks": "Weeks",
   "sched_unit_months": "Months",
@@ -364,11 +431,23 @@
   "todo_tag_folders": "Folders",
   "todo_tag_list": "List",
   "todo_tag_count": "{n} open",
-  "@todo_tag_count": {"placeholders": {"n": {"type": "int"}}},
+  "@todo_tag_count": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "todo_tag_icon": "Icon",
   "todo_tag_pick": "Pick tags",
   "todo_tag_filtered": "Filtered by {name}",
-  "@todo_tag_filtered": {"placeholders": {"name": {"type": "String"}}},
+  "@todo_tag_filtered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "uncategorized": "Uncategorized",
   "more_icons": "More icons",
   "less_icons": "Fewer icons",
@@ -392,7 +471,7 @@
   "view_source": "View source on GitHub",
   "about_title": "Built for you. Free, forever.",
   "about_footer": "Made with ☕ and a lot of free time.",
-  "about_body": "Streak was born from a simple idea: why pay to track your own habits?\n\nThis app is completely open source. Anyone can see exactly how it works, suggest improvements, or even build their own version. No black boxes. No surprises.\n\nYour privacy is total — everything stays on your phone. No accounts, no servers, no ads. Not a single byte leaves your device.\n\nNo limits. Create as many habits as you want. No subscriptions, no \"pro version\", no pop-ups asking you to pay. Ever.\n\nIf the app brings you something, you can support it with a star on GitHub or by buying me a coffee. But it is completely optional — the app is yours either way.",
+  "about_body": "Flash was born from a simple idea: why pay to track your own habits?\n\nThis app is completely open source. Anyone can see exactly how it works, suggest improvements, or even build their own version. No black boxes. No surprises.\n\nYour privacy is total — everything stays on your phone. No accounts, no servers, no ads. Not a single byte leaves your device.\n\nNo limits. Create as many habits as you want. No subscriptions, no \"pro version\", no pop-ups asking you to pay. Ever.\n\nIf the app brings you something, you can support it with a star on GitHub or by buying me a coffee. But it is completely optional — the app is yours either way.",
   "close": "Close",
   "no_data_yet": "No data yet",
   "import_question_body": "Replace all your current habits with the backup, or merge them together?",
@@ -461,7 +540,6 @@
   "consistency_trend": "Consistency trend",
   "by_habit": "By habit",
   "ranking": "Ranking",
-  "last_30_days": "Last 30 days",
   "active_days": "Active days",
   "perfect_days": "Perfect days",
   "per_week": "Per week",
@@ -476,9 +554,9 @@
   },
   "streak_off": "💪 Today you can start a new streak",
   "not_enough_data": "Not enough data yet",
-  "about_inline": "Streak is an open-source app for tracking your habits. No accounts, no limits, no payments. Everything stays on your phone.\n\nAnyone can see the code, improve it, or use it freely.",
+  "about_inline": "Flash is an open-source app for tracking your habits. No accounts, no limits, no payments. Everything stays on your phone.\n\nAnyone can see the code, improve it, or use it freely.",
   "about_subtitle": "For the days you choose to show up.",
-  "about_story": "This app was born out of frustration with the habit trackers out there. Most cap how many habits you can create, hide basic features behind a paywall, track you, or bombard you with ads. So I decided to build Streak: completely free, no ads, no payments, no tracking. Everything runs locally — your data is yours. Open source, no catch.",
+  "about_story": "This app was born out of frustration with the habit trackers out there. Most cap how many habits you can create, hide basic features behind a paywall, track you, or bombard you with ads. So I decided to build Flash: completely free, no ads, no payments, no tracking. Everything runs locally — your data is yours. Open source, no catch.",
   "made_by": "Made with ❤️ by @InlitX",
   "share": "Share",
   "share_progress": "Share progress",
@@ -496,7 +574,7 @@
   "about_credits": "Credits",
   "about_credits_body": "Built with Flutter. Icons by Lucide. Charts by fl_chart. Set in Figtree & Playfair Display.",
   "dev_handle": "@InlitX",
-  "dev_role": "Indie maker · Streak",
+  "dev_role": "Indie maker · Flash",
   "notes": "Notes",
   "notes_enable_sub": "Attach notes to any day of a habit",
   "add_note": "Add note",
@@ -516,7 +594,11 @@
   "tomorrow": "Tomorrow",
   "notes_count": "{count, plural, =1{1 note} other{{count} notes}}",
   "@notes_count": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "todos": "To-Do",
   "todos_enable_sub": "A quick list beside your habits",
@@ -540,18 +622,30 @@
   "pick_a_date": "Pick a date",
   "todo_left": "{count, plural, =0{All done} =1{1 to do} other{{count} to do}}",
   "@todo_left": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "todo_completed_count": "{count, plural, =1{Completed (1)} other{Completed ({count})}}",
   "@todo_completed_count": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "todo_search": "Search to-dos",
   "todo_search_empty": "Nothing matches that",
   "todo_clear_completed": "Clear completed",
   "todo_clear_completed_body": "{count, plural, =1{This deletes the completed to-do.} other{This deletes the {count} completed to-dos.}}",
   "@todo_clear_completed_body": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "prefs_general": "General",
   "prefs_features": "Features",
@@ -595,7 +689,11 @@
   "unit_seconds": "seconds",
   "focus_target_reached": "Target reached",
   "@focus_saved": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "focus_pause": "Pause",
   "focus_resume": "Resume",
@@ -613,13 +711,28 @@
   "focus_end_add_time": "Add focused time",
   "focus_amount_added": "{amount} added to {habit}",
   "@focus_end_short": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "@focus_end_tasks": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "@focus_amount_added": {
-    "placeholders": { "amount": { "type": "String" }, "habit": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "habit": {
+        "type": "String"
+      }
+    }
   },
   "focus_personalize": "Custom",
   "focus_track_rain": "Rain",
@@ -656,25 +769,40 @@
   "select_all": "Select all",
   "selected_count": "{count, plural, =1{1 selected} other{{count} selected}}",
   "@selected_count": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "focus_delete_sessions": "Delete sessions?",
   "focus_delete_sessions_body": "{count, plural, =1{1 focus session will be removed. This cannot be undone.} other{{count} focus sessions will be removed. This cannot be undone.}}",
   "@focus_delete_sessions_body": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "focus_sessions_deleted": "{count, plural, =1{1 session deleted} other{{count} sessions deleted}}",
   "@focus_sessions_deleted": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "unscheduled_title": "Day not scheduled",
   "unscheduled_body": "This habit is not scheduled on {day}. Log it anyway as an extra?",
   "@unscheduled_body": {
-    "placeholders": { "day": { "type": "String" } }
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
   },
   "unscheduled_confirm": "Log anyway",
   "rest_days_none": "None",
-  "consistency": "Consistency",
   "last_90_days": "Last 90 days",
   "focus_clear_today": "Clear today's sessions",
   "focus_defaults": "Session defaults",
@@ -687,7 +815,11 @@
   "day_timeline": "Day",
   "day_timeline_free": "{span} free",
   "@day_timeline_free": {
-    "placeholders": { "span": { "type": "String" } }
+    "placeholders": {
+      "span": {
+        "type": "String"
+      }
+    }
   },
   "day_timeline_anytime": "Anytime",
   "day_timeline_empty": "Nothing planned for this day",
@@ -706,14 +838,29 @@
   "focus_history_empty_sub": "Every focus session you finish shows up here.",
   "focus_history_day": "{count, plural, =1{1 session} other{{count} sessions}}",
   "@focus_history_day": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "yesterday": "Yesterday",
   "@focus_round": {
-    "placeholders": { "n": { "type": "int" } }
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
   },
   "@focus_goal_today": {
-    "placeholders": { "done": { "type": "String" }, "goal": { "type": "String" } }
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
   },
   "notes_hint": "Open a habit and long-press a day on its calendar to see or add notes",
   "app_style": "App style",
@@ -793,23 +940,39 @@
   "focus_only_title": "Needs a focus session",
   "focus_only_body": "\"{name}\" is completed by finishing a focus session.",
   "@focus_only_body": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "focus_only_past": "\"{name}\" is only completed by a focus session, so past days cannot be checked.",
   "@focus_only_past": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "focus_only_clear_title": "Clear this check?",
   "focus_only_clear_body": "Only a focus session can check \"{name}\" again.",
   "@focus_only_clear_body": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "focus_only_start": "Start session",
   "focus_flowtime": "Flowtime",
   "focus_flowtime_hint": "No goal and no alarm. The clock counts up and you stop when you feel done.",
   "focus_end_flow": "You focused for {time}.",
   "@focus_end_flow": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "on": "On",
   "off": "Off",
@@ -841,21 +1004,27 @@
   "vacation_day_off": "Remove vacation day",
   "rest_days": "Rest days",
   "rest_days_desc": "Pause it every week on these days. You can still log them, and they'll count.",
-  "widget_no_habits": "No habits yet\nTap to open Streak",
-  "widget_no_data": "No data yet\nOpen Streak to sync",
-  "widget_open_to_sync": "Open Streak to sync",
+  "widget_no_habits": "No habits yet\nTap to open Flash",
+  "widget_no_data": "No data yet\nOpen Flash to sync",
+  "widget_open_to_sync": "Open Flash to sync",
   "widget_activity": "Activity",
   "widget_today_progress": "Today  {done}/{total}",
   "@widget_today_progress": {
     "placeholders": {
-      "done": { "type": "String" },
-      "total": { "type": "String" }
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "widget_todos_open": "To-do  {count}",
   "@widget_todos_open": {
     "placeholders": {
-      "count": { "type": "String" }
+      "count": {
+        "type": "String"
+      }
     }
   },
   "widget_todos_empty": "Nothing left for today",
@@ -863,7 +1032,9 @@
   "widget_best_streak": "🔥 {streak} best streak",
   "@widget_best_streak": {
     "placeholders": {
-      "streak": { "type": "String" }
+      "streak": {
+        "type": "String"
+      }
     }
   },
   "widget_cfg_title": "Customize widget",
@@ -878,14 +1049,18 @@
   "widget_cfg_opacity": "Opacity  {value}%",
   "@widget_cfg_opacity": {
     "placeholders": {
-      "value": { "type": "String" }
+      "value": {
+        "type": "String"
+      }
     }
   },
   "widget_cfg_border": "Border",
   "widget_cfg_thickness": "Thickness  {value}dp",
   "@widget_cfg_thickness": {
     "placeholders": {
-      "value": { "type": "String" }
+      "value": {
+        "type": "String"
+      }
     }
   },
   "widget_cfg_todos_scope": "Tasks",
@@ -909,19 +1084,25 @@
   "notif_streak": "🔥 {streak} day streak",
   "@notif_streak": {
     "placeholders": {
-      "streak": { "type": "String" }
+      "streak": {
+        "type": "String"
+      }
     }
   },
   "notif_streak_week": "🔥 {streak} week streak",
   "@notif_streak_week": {
     "placeholders": {
-      "streak": { "type": "String" }
+      "streak": {
+        "type": "String"
+      }
     }
   },
   "notif_streak_month": "🔥 {streak} month streak",
   "@notif_streak_month": {
     "placeholders": {
-      "streak": { "type": "String" }
+      "streak": {
+        "type": "String"
+      }
     }
   },
   "notif_action_done": "Done",
@@ -934,42 +1115,54 @@
   "minutes_short": "{value} min",
   "@minutes_short": {
     "placeholders": {
-      "value": { "type": "String" }
+      "value": {
+        "type": "String"
+      }
     }
   },
   "a11y_mark_done": "Mark {name} as done",
   "@a11y_mark_done": {
     "description": "Screen reader label for the button that logs a habit",
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "a11y_mark_not_done": "Mark {name} as not done",
   "@a11y_mark_not_done": {
     "description": "Screen reader label for the button that undoes a habit",
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "a11y_add_amount": "Add to {name}",
   "@a11y_add_amount": {
     "description": "Screen reader label for the button that adds progress to a quantitative habit",
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "a11y_log_relapse": "Log a relapse for {name}",
   "@a11y_log_relapse": {
     "description": "Screen reader label for the button that logs a relapse on a habit to avoid",
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "a11y_clear_relapse": "Clear today's relapse for {name}",
   "@a11y_clear_relapse": {
     "description": "Screen reader label for the button that removes today's relapse",
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "a11y_not_done": "not done",
@@ -1000,11 +1193,19 @@
   "period_last_year": "Last year",
   "period_week_of": "Week of {date}",
   "@period_week_of": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "focus_period_sessions": "{count, plural, =0{No sessions} =1{1 session} other{{count} sessions}}",
   "@focus_period_sessions": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "notes_all": "All notes",
   "notes_empty_all": "No notes yet",
@@ -1140,13 +1341,25 @@
   "last_check": "Last check",
   "check_history": "Check history",
   "check_history_sub": "{count} days checked off",
-  "@check_history_sub": {"placeholders": {"count": {"type": "String"}}},
+  "@check_history_sub": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "check_never": "Never",
   "check_no_time": "no time saved",
   "heatmap_rolling": "Last 12 months",
   "heatmap_rolling_sub": "The yearly grid ends today instead of on 31 December",
   "check_marks": "{count} marks",
-  "@check_marks": {"placeholders": {"count": {"type": "String"}}},
+  "@check_marks": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "today_progress_option": "Progress on Today",
   "today_progress_option_sub": "The day's ring and the strength bar on each habit",
   "quiet_when_done": "Quiet once done",
@@ -1166,9 +1379,15 @@
   "pin_enter": "Enter your PIN",
   "pin_wrong": "Wrong PIN",
   "pin_wait": "Too many tries. Wait {seconds} s",
-  "@pin_wait": {"placeholders": {"seconds": {"type": "String"}}},
+  "@pin_wait": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
   "pin_recovery_title": "Your recovery code",
-  "pin_recovery_body": "If you forget the PIN, this code opens Streak and turns the lock off. Keep it somewhere safe: it won't be shown again.",
+  "pin_recovery_body": "If you forget the PIN, this code opens Flash and turns the lock off. Keep it somewhere safe: it won't be shown again.",
   "pin_copy": "Copy code",
   "pin_copied": "Code copied",
   "pin_forgot": "Forgot your PIN?",

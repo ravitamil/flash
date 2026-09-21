@@ -21,7 +21,7 @@ class StartupFailure extends StatelessWidget {
                 const Icon(Icons.error_outline, color: Colors.white70, size: 48),
                 const SizedBox(height: 16),
                 const Text(
-                  'Streak could not open its data',
+                  'Flash could not open its data',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,

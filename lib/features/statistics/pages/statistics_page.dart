@@ -29,6 +29,10 @@ import 'package:streak/features/statistics/widgets/period_totals.dart';
 import 'package:streak/features/statistics/widgets/stat_kit.dart';
 import 'package:streak/features/statistics/widgets/stat_line_charts.dart';
 import 'package:streak/features/statistics/widgets/year_heatmap.dart';
+import 'package:streak/features/statistics/widgets/todo_statistics_view.dart';
+import 'package:streak/features/todos/state/todos_controller.dart';
+
+enum StatScope { habits, todos }
 
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key});
@@ -40,6 +44,7 @@ class StatisticsPage extends StatefulWidget {
 class _StatisticsPageState extends State<StatisticsPage> {
   int _year = AppClock.now().year;
   String? _habitId;
+  StatScope _scope = StatScope.habits;
 
   ({List<Habit> habits, String? id, int year})? _statsKey;
   HabitStats _stats = HabitStats.empty;
@@ -63,33 +68,68 @@ class _StatisticsPageState extends State<StatisticsPage> {
     if (settings.isExpressStyle) return const ExpressStatisticsPage();
     if (settings.isMinimalStyle) return const MinimalStatisticsPage();
 
+    final todosController = context.watch<TodosController>();
+    final habitsController = context.watch<HabitsController>();
+    final todos = todosController.all;
+    final all = habitsController.habits;
+    final todosEnabled = settings.todosEnabled;
+
+    final hasHabits = all.isNotEmpty;
+    final hasTodos = todos.isNotEmpty;
+
+    if (!hasHabits && (!todosEnabled || !hasTodos)) {
+      return Scaffold(
+        appBar: AppBar(title: Text(context.l10n.statistics)),
+        body: AppEmptyState(
+          icon: LucideIcons.chartColumn,
+          title: context.l10n.no_data_yet,
+          message: context.l10n.stats_empty,
+        ),
+      );
+    }
+
+    final activeScope = (!hasHabits && todosEnabled && hasTodos)
+        ? StatScope.todos
+        : (todosEnabled ? _scope : StatScope.habits);
+
+    if (_habitId != null && habitsController.byId(_habitId!) == null) {
+      _habitId = null;
+    }
+    final scoped = _habitId == null
+        ? HabitStats.counted(all)
+        : [habitsController.byId(_habitId!)!];
+    final accent =
+        _habitId == null ? context.colors.primary : scoped.first.color;
+    final stats = hasHabits ? _statsFor(scoped, all) : HabitStats.empty;
+    final currentYear = AppClock.now().year;
+
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.statistics)),
-      body: Consumer<HabitsController>(
-        builder: (context, controller, _) {
-          final all = controller.habits;
-          if (all.isEmpty) {
-            return AppEmptyState(
-              icon: LucideIcons.chartColumn,
-              title: context.l10n.no_data_yet,
+      body: ListView(
+        padding: context.pagePadding(16, 8, 16, 104),
+        children: [
+          if (todosEnabled && (hasHabits || hasTodos)) ...[
+            _ScopeSwitcher(
+              scope: activeScope,
+              onChanged: (s) => setState(() => _scope = s),
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (activeScope == StatScope.todos)
+            TodoStatisticsView(
+              todos: todos,
+              year: _year,
+              onYearChanged: (y) => setState(() => _year = y),
+            )
+          else if (!hasHabits)
+            AppEmptyState(
+              icon: LucideIcons.sprout,
+              title: context.l10n.no_habits_yet,
               message: context.l10n.stats_empty,
-            );
-          }
-
-          if (_habitId != null && controller.byId(_habitId!) == null) {
-            _habitId = null;
-          }
-          final scoped = _habitId == null
-              ? HabitStats.counted(all)
-              : [controller.byId(_habitId!)!];
-          final accent =
-              _habitId == null ? context.colors.primary : scoped.first.color;
-          final stats = _statsFor(scoped, all);
-          final currentYear = AppClock.now().year;
-
-          return ListView(
-            padding: context.pagePadding(16, 8, 16, 104),
-            children: spanned(context, [
+              compact: true,
+            )
+          else
+            ...spanned(context, [
               const IslandEntry(),
               HabitFilter(
                 habits: all,
@@ -303,8 +343,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 child: _SecondaryStats(stats: stats, accent: accent),
               ),
             ]),
-          );
-        },
+        ],
       ),
     );
   }
@@ -651,6 +690,116 @@ class _FocusStats extends StatelessWidget {
             ],
           ],
         ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScopeSwitcher extends StatelessWidget {
+  const _ScopeSwitcher({
+    required this.scope,
+    required this.onChanged,
+  });
+
+  final StatScope scope;
+  final ValueChanged<StatScope> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    return Container(
+      height: 42,
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(3),
+      child: Row(
+        children: [
+          Expanded(
+            child: _ScopeTab(
+              label: 'Habits',
+              icon: LucideIcons.flame,
+              selected: scope == StatScope.habits,
+              onTap: () => onChanged(StatScope.habits),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: _ScopeTab(
+              label: 'Tasks',
+              icon: LucideIcons.checkSquare2,
+              selected: scope == StatScope.todos,
+              onTap: () => onChanged(StatScope.todos),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScopeTab extends StatelessWidget {
+  const _ScopeTab({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final muted = context.tokens.muted;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: selected ? scheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(13),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: scheme.primary.withValues(alpha: 0.28),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 15,
+                color: selected ? scheme.onPrimary : muted,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  color: selected ? scheme.onPrimary : muted,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

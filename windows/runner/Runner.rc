@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "InlitX" "\0"
-            VALUE "FileDescription", "Streak" "\0"
+            VALUE "FileDescription", "Flash" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "Streak" "\0"
+            VALUE "InternalName", "Flash" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 InlitX. Licensed under the GNU GPL v3." "\0"
-            VALUE "OriginalFilename", "Streak.exe" "\0"
-            VALUE "ProductName", "Streak" "\0"
+            VALUE "OriginalFilename", "Flash.exe" "\0"
+            VALUE "ProductName", "Flash" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

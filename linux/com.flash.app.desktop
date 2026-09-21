@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Flash
+Comment=A minimal habit tracker that helps you build lasting streaks
+Exec=Flash
+Icon=com.flash.app
+Terminal=false
+Categories=Utility;
+Keywords=habit;habits;streak;tracker;flash;
+StartupWMClass=com.flash.app

@@ -12,13 +12,20 @@
 
 <div align="center">
 
-### Streak
+### Flash
 
-<img src="assets/icon.svg" width="72" alt="Streak logo" />
+<img src="assets/icon.png" width="72" alt="Flash logo" />
 
-### A minimal, private, ad-free habit tracker
+### A private, ad-free habit & task tracker with advanced analytics
 
-Log a habit in a single tap, keep your momentum, and watch your streaks grow.
+Log a habit in a single tap, track recurring tasks, and watch your productivity grow.
+
+<br/>
+
+> **🙏 Full Attribution & Upstream Credit**  
+> **Flash** is an open-source productivity app built on top of [Streak](https://github.com/InlitX/streak), originally designed and crafted with care by [@InlitX](https://github.com/InlitX).  
+> All core habit-tracking engines, focus timers, local encrypted storage, and foundational design systems are courtesy of InlitX and the Streak contributors.  
+> If you find this software helpful, please consider **[starring the upstream repository](https://github.com/InlitX/streak)** and **[supporting InlitX on Ko-fi](https://ko-fi.com/inlitx)**!
 
 <br/>
 
@@ -28,36 +35,67 @@ Log a habit in a single tap, keep your momentum, and watch your streaks grow.
   <img alt="Android" src="https://img.shields.io/badge/Android-3DDC84?style=flat&logo=android&logoColor=white" />
   <img alt="License GPLv3" src="https://img.shields.io/badge/License-GPLv3-7C3AED?style=flat&logo=gnu&logoColor=white" />
   <img alt="No ads, no tracking" src="https://img.shields.io/badge/No%20ads%20%C2%B7%20No%20tracking-22C55E?style=flat&logo=shield&logoColor=white" />
-  <img alt="Downloads" src="https://img.shields.io/github/downloads/InlitX/streak/total?style=flat&logo=github&logoColor=white&label=Downloads&color=7C3AED" />
 </p>
-<a href="https://trendshift.io/repositories/79460?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-79460" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/79460" alt="InlitX%2Fstreak | Trendshift" width="250" height="55"/></a>
-
-<br/>
-
-<a href="https://f-droid.org/packages/com.streak.app/"><img alt="Get it on F-Droid" src="assets/badges/get-it-on-fdroid.png" height="60" /></a>
-&nbsp;
-<a href="https://apt.izzysoft.de/fdroid/index/apk/com.streak.app?repo=main"><img alt="Get it on IzzyOnDroid" src="assets/badges/get-it-on-izzyondroid.png" height="60" /></a>
-&nbsp;
-<a href="https://www.openapk.net/streak/com.streak.app/"><img alt="Get it on OpenAPK" src="assets/badges/get-it-on-openapk.png" height="60" /></a>
-&nbsp;
-<a href="https://github.com/InlitX/streak/releases"><img alt="Get it on GitHub" src="assets/badges/get-it-on-github.png" height="60" /></a>
-&nbsp;
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.streak.app%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FInlitX%2Fstreak%22%2C%22author%22%3A%22InlitX%22%2C%22name%22%3A%22Streak%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Afalse%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Atrue%2C%5C%22releaseDateAsVersion%5C%22%3Afalse%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22allowInsecure%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22Streak%20is%20an%20open%20source%20habit%20tracker%20for%20Android.%20Build%20habits%20with%20one%20tap%2C%20watch%20your%20progress%20grow%2C%20and%20keep%20everything%20on%20your%20device.%20No%20accounts%2C%20no%20ads%2C%20no%20tracking.%5C%22%7D%22%2C%22overrideSource%22%3Anull%7D"><img alt="Get it on Obtainium" src="assets/badges/get-it-on-obtainium.png" height="60" /></a>
 
 <br/>
 
 <sub>
-  <a href="#features">Features</a> ·
-  <a href="#coming-from-another-app">Import</a> ·
-  <a href="#download">Download</a> ·
+  <a href="#flash-features">Flash Features</a> ·
+  <a href="#upstream-habit-tracking">Habit Tracking</a> ·
+  <a href="#focus">Focus Timer</a> ·
   <a href="#privacy">Privacy</a> ·
-  <a href="#translations">Translations</a> ·
-  <a href="#support">Support</a>
+  <a href="#upstream-sync">Upstream Sync</a> ·
+  <a href="#license">License</a>
 </sub>
 
 </div>
 
 ---
+
+## ⚡ Features Added in Flash
+
+On top of the comprehensive habit tracker and focus timer from Streak v2.0.0, Flash introduces:
+
+### 1. 🔁 Advanced To-Do Recurrence Engine
+- **Flexible Repeat Frequencies**: Set tasks to repeat `Daily`, `Weekdays` (auto-skips weekends), `Weekly`, `Monthly`, or at `Custom` day intervals.
+- **Completion History**: Completing a recurring task logs the completion date into `completedDates` and advances to the next due date without destroying task context.
+- **Historical View**: Recurring tasks appear in the Completed tab with completion date records and recurrence badges.
+
+### 2. 📝 To-Do Notes System
+- **Rich Context Anywhere**: View and edit multi-line notes, agendas, and deliverables at any task lifecycle stage (pending, active, recurring, or completed).
+- **Instant Bottom Sheet**: Accessible via tap on any task tile or preview card.
+
+### 3. ⏱️ Duration Estimation & Day Planning
+- **Time Block Presets**: Quick-select `15m`, `30m`, `45m`, `60m`, `90m`, `120m` or custom duration.
+- **Schedule Sync**: Displays duration pills on task tiles and feeds into the Day Timeline schedule.
+
+### 4. 📊 Dedicated To-Do Statistics Dashboard
+- **Habits | Tasks Top Switcher**: Seamless scope switcher on the Statistics tab across both Classic and Express styles.
+- **2x2 Headline Metrics**: Completed tasks this year, completed this week, on-time completion rate (%), and velocity (average completions per active day).
+- **Charts & Distributions**:
+  - *Weekday Distribution*: Bar chart highlighting completions from Monday through Sunday.
+  - *Monthly Trend Line*: Annual completion curve across all 12 months.
+  - *Priority Breakdown*: Ranked horizontal progress bars color-coded by priority.
+  - *Project Breakdown*: Donut chart and ranked project list with percentage distribution.
+  - *Project Filtering*: Quick filter chips to view metrics for "All Projects" or specific folders.
+
+### 5. 🎯 Streamlined UX & Ergonomics
+- **Unified Completed Tasks**: Unified completed task management into a clean `[Pending]` / `[Completed]` segmented toggle, removing redundant sheets and collapsible menus.
+- **View Mode Retention**: User choice between Folder View and Detailed List View persists permanently across app restarts and process kills.
+- **Enlarged Bottom Navigation**: Refactored tab bar height, touch targets, and typography for comfortable one-handed use.
+- **Unified FAB Design**: Aligned the Habits screen Floating Action Button styling, geometry, and elevation with the To-Do screen FAB.
+- **Simplified App Styles**: Streamlined options to polished **Classic** and **Express** styles, cleanly removing the unused Minimal style.
+- **Launcher Stability**: Fully removed Android `<activity-alias>` tags, preventing home screen icon disappearance and startup crashes on Android 12–15.
+
+---
+
+## Overview
+
+Flash (built on Streak) is an open source habit and task tracker for Android, Windows and Linux. Make as
+many habits and tasks as you want, log them with one tap, and watch the grid, the streak
+counters and the statistics fill up.
+
+Everything stays on your device. No account, no ads, nothing to sync.
 
 <div align="center">
 

@@ -224,11 +224,11 @@
       }
     }
   },
-  "share_friends_message": "היישום Streak עוזר לי לבנות הרגלים חדשים – זהו יישום לניהול הרגלים, הוא קליל וחופשי ולא דורש חיבור לאינטרנט או יצירת חשבון, והוא נטול פרסומות. אני רוצה להזמין אותך לבנות הרגלים משלך: https://inlitx.github.io/streak/",
-  "app_lock_sub": "דרישת טביעת אצבע או זיהוי פנים לפתיחת Streak",
+  "share_friends_message": "היישום Flash עוזר לי לבנות הרגלים חדשים – זהו יישום לניהול הרגלים, הוא קליל וחופשי ולא דורש חיבור לאינטרנט או יצירת חשבון, והוא נטול פרסומות. אני רוצה להזמין אותך לבנות הרגלים משלך: https://inlitx.github.io/streak/",
+  "app_lock_sub": "דרישת טביעת אצבע או זיהוי פנים לפתיחת Flash",
   "app_lock_unavailable": "לא הוגדרו פרטי אימות ביומטריים בטלפון זה",
   "app_lock_failed": "לא היה ניתן לאמת את זהותך",
-  "app_lock_title": "היישום Streak נעול",
+  "app_lock_title": "היישום Flash נעול",
   "journey_sub": "{count, plural, =1{תמונה אחת} other{{count} תמונות}}",
   "@journey_sub": {
     "placeholders": {

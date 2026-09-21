@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:streak/app/home_shell.dart';
-import 'package:streak/core/minimal/minimal_nav.dart';
 import 'package:streak/features/habits/pages/home_page.dart';
 import 'package:streak/features/settings/pages/settings_page.dart';
 import 'package:streak/features/statistics/pages/statistics_page.dart';
@@ -93,34 +92,5 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(TodosPage), findsNothing);
-  });
-
-  testWidgets('a wide window gives minimal a rail and a detail pane',
-      (tester) async {
-    await seedHabits(tester, [
-      testHabit(id: 'a', name: 'Read', done: lastDays(5)),
-    ]);
-    await pumpScreen(tester, const HomeShell(), minimal: true);
-
-    tester.view.physicalSize = const Size(1500, 940);
-    tester.view.devicePixelRatio = 1;
-    await tester.pumpAndSettle();
-
-    expect(find.byType(MinimalNavRail), findsOneWidget);
-
-    await tester.tap(find.text('Stats').first);
-    await tester.pumpAndSettle();
-    expect(find.byType(StatisticsPage), findsOneWidget);
-  });
-
-  testWidgets('minimal drops the bar and keeps only the home', (tester) async {
-    await seedHabits(tester, [
-      testHabit(id: 'a', name: 'Read', done: lastDays(5)),
-    ]);
-    await pumpScreen(tester, const HomeShell(), minimal: true);
-
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(StatisticsPage), findsNothing);
-    expect(find.byType(SettingsPage), findsNothing);
   });
 }

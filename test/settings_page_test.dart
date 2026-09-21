@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streak/core/database/local_store.dart';
-import 'package:streak/features/settings/pages/minimal_settings_page.dart';
+import 'package:streak/features/settings/pages/express_settings_page.dart';
 import 'package:streak/features/settings/pages/settings_page.dart';
 
 import 'support/app_harness.dart';
@@ -47,10 +47,14 @@ void main() {
     await scrollToEnd(tester);
   });
 
-  testWidgets('minimal takes over the same screen', (tester) async {
-    await pumpScreen(tester, const SettingsPage(), minimal: true);
+  testWidgets('express takes over the settings screen', (tester) async {
+    await pumpScreen(
+      tester,
+      const SettingsPage(),
+      settings: {'appStyle': 2},
+    );
 
-    expect(find.byType(MinimalSettingsPage), findsOneWidget);
+    expect(find.byType(ExpressSettingsPage), findsOneWidget);
     expect(find.byType(ClassicSettingsPage), findsNothing);
 
     await scrollToEnd(tester);

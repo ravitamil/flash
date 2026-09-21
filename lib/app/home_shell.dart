@@ -168,14 +168,6 @@ class _HomeShellState extends State<HomeShell>
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsController>();
     final wide = isWideLayout(context);
-    final minimal = settings.isMinimalStyle;
-    if (minimal && !wide) {
-      return _guard(
-        const [_Tab.today],
-        _Tab.today,
-        const Scaffold(body: HomePage()),
-      );
-    }
     final scheme = Theme.of(context).colorScheme;
     final express = settings.isExpressStyle;
     final tabs = [
@@ -255,14 +247,15 @@ class _HomeShellState extends State<HomeShell>
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                 decoration: BoxDecoration(
                   color: scheme.surface.withValues(alpha: 0.94),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(26),
                   border: Border.all(
                     color: scheme.outlineVariant.withValues(alpha: 0.45),
+                    width: 1.2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.24),
-                      blurRadius: 20,
+                      color: Colors.black.withValues(alpha: 0.28),
+                      blurRadius: 24,
                       offset: const Offset(0, 8),
                     ),
                   ],
@@ -344,17 +337,17 @@ class _NavItem extends StatelessWidget {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: dense ? 2 : 4),
+          padding: EdgeInsets.symmetric(horizontal: dense ? 2 : 3),
           child: Center(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 320),
               curve: Curves.easeOutCubic,
               padding: EdgeInsets.symmetric(
-                horizontal: dense ? (selected ? 13 : 11) : (selected ? 18 : 16),
-                vertical: 10,
+                horizontal: dense ? (selected ? 14 : 10) : (selected ? 18 : 14),
+                vertical: 11,
               ),
               decoration: BoxDecoration(
-                color: scheme.primary.withValues(alpha: selected ? 0.16 : 0),
+                color: scheme.primary.withValues(alpha: selected ? 0.18 : 0),
                 borderRadius: BorderRadius.circular(22),
               ),
               child: Row(
@@ -364,7 +357,7 @@ class _NavItem extends StatelessWidget {
                     scale: selected ? 1.08 : 1,
                     duration: const Duration(milliseconds: 320),
                     curve: Curves.easeOutBack,
-                    child: Icon(icon, size: 21, color: tint),
+                    child: Icon(icon, size: 22, color: tint),
                   ),
                   ClipRect(
                     child: AnimatedSize(
@@ -372,10 +365,10 @@ class _NavItem extends StatelessWidget {
                       curve: Curves.easeOutCubic,
                       child: selected
                           ? Padding(
-                              padding: const EdgeInsets.only(left: 8),
+                              padding: const EdgeInsets.only(left: 7),
                               child: ConstrainedBox(
                                 constraints:
-                                    BoxConstraints(maxWidth: dense ? 72 : 88),
+                                    BoxConstraints(maxWidth: dense ? 68 : 88),
                                 child: Text(
                                   label,
                                   maxLines: 1,
@@ -652,7 +645,7 @@ class _RailBrand extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text(
-            'Streak',
+            'Flash',
             style: settings.isExpressStyle
                 ? ExpressType.headline.at(
                     17,

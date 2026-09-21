@@ -22,11 +22,17 @@ import 'package:streak/core/widgets/section_label.dart';
 import 'package:streak/features/habits/data/day_plan.dart';
 import 'package:streak/features/habits/data/habit.dart';
 import 'package:streak/features/habits/pages/habit_details_page.dart';
+import 'package:streak/features/habits/pages/habit_form_page.dart';
 import 'package:streak/features/habits/state/habits_controller.dart';
 import 'package:streak/features/habits/widgets/day_timeline_parts.dart';
 import 'package:streak/features/habits/widgets/focus_only_dialog.dart';
 import 'package:streak/features/habits/widgets/unscheduled_day_dialog.dart';
 import 'package:streak/features/settings/state/settings_controller.dart';
+import 'package:streak/features/todos/data/todo.dart';
+import 'package:streak/features/todos/state/todos_controller.dart';
+import 'package:streak/features/todos/state/todo_tags_controller.dart';
+import 'package:streak/features/todos/widgets/todo_composer.dart';
+import 'package:streak/features/todos/widgets/todo_preview.dart';
 
 const _entrance = Duration(milliseconds: 320);
 
@@ -40,6 +46,7 @@ class DayTimelinePage extends StatefulWidget {
 class _DayTimelinePageState extends State<DayTimelinePage> {
   late DateTime _day = AppClock.today();
   final _celebration = ValueNotifier(0);
+  PlanFilter _filter = PlanFilter.all;
 
   @override
   void dispose() {
@@ -75,10 +82,190 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
     }
   }
 
+  Future<void> _checkTodo(Todo todo) async {
+    final controller = context.read<TodosController>();
+    final wasDone = todo.isCompletedOn(_day);
+    await controller.toggle(todo.id);
+    if (!mounted) return;
+
+    final updated = controller.byId(todo.id);
+    if (_isToday && !wasDone && (updated?.isCompletedOn(_day) ?? false)) {
+      _celebration.value++;
+    }
+  }
+
+  Future<void> _openTodo(Todo todo) async {
+    final action = await showTodoPreview(context, todo);
+    if (!mounted || action == null) return;
+    if (action == 'edit') {
+      final fresh = context.read<TodosController>().byId(todo.id) ?? todo;
+      await showTodoComposer(context, todo: fresh);
+    }
+  }
+
+  Future<void> _scheduleAt(int minutes) async {
+    final todosEnabled = context.read<SettingsController>().todosEnabled;
+    if (!todosEnabled) {
+      await AppNavigator.push(const HabitFormPage());
+      return;
+    }
+
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Schedule for ${minuteLabel(minutes)}',
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 14),
+              ListTile(
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.colors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(LucideIcons.checkSquare2, color: context.colors.primary, size: 18),
+                ),
+                title: const Text('Add Task', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text('Due ${minuteLabel(minutes)}'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                onTap: () => Navigator.pop(sheetContext, 'todo'),
+              ),
+              const SizedBox(height: 6),
+              ListTile(
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.colors.secondary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(LucideIcons.sparkles, color: context.colors.secondary, size: 18),
+                ),
+                title: const Text('Create Habit', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Routine or recurring activity'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                onTap: () => Navigator.pop(sheetContext, 'habit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || choice == null) return;
+    if (choice == 'todo') {
+      await showTodoComposer(
+        context,
+        initialDate: _day.dayKey,
+        initialMinutes: minutes,
+      );
+    } else if (choice == 'habit') {
+      await AppNavigator.push(const HabitFormPage());
+    }
+  }
+
+  Future<void> _quickAdd() async {
+    final todosEnabled = context.read<SettingsController>().todosEnabled;
+    if (!todosEnabled) {
+      await AppNavigator.push(const HabitFormPage());
+      return;
+    }
+
+    if (_filter == PlanFilter.todos) {
+      await showTodoComposer(context, initialDate: _day.dayKey);
+      return;
+    }
+    if (_filter == PlanFilter.habits) {
+      await AppNavigator.push(const HabitFormPage());
+      return;
+    }
+
+    final locale = Localizations.localeOf(context).toString();
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                DateFormat.yMMMMd(locale).format(_day),
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 14),
+              ListTile(
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.colors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(LucideIcons.checkSquare2, color: context.colors.primary, size: 18),
+                ),
+                title: const Text('Add Task', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text('Due on ${_day.dayKey}'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                onTap: () => Navigator.pop(sheetContext, 'todo'),
+              ),
+              const SizedBox(height: 6),
+              ListTile(
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.colors.secondary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(LucideIcons.sparkles, color: context.colors.secondary, size: 18),
+                ),
+                title: const Text('New Habit', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Routine or recurring activity'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                onTap: () => Navigator.pop(sheetContext, 'habit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || choice == null) return;
+    if (choice == 'todo') {
+      await showTodoComposer(context, initialDate: _day.dayKey);
+    } else if (choice == 'habit') {
+      await AppNavigator.push(const HabitFormPage());
+    }
+  }
+
   Color _neighbourColor(DayPlan plan, int from, int step) {
     for (var i = from; i >= 0 && i < plan.slots.length; i += step) {
-      final habit = plan.slots[i].habit;
-      if (habit != null) return habit.color;
+      final slot = plan.slots[i];
+      if (slot.habit != null) return slot.habit!.color;
+      if (slot.todo != null) {
+        return slot.todo!.priority != TodoPriority.none
+            ? todoPriorityColor(context, slot.todo!.priority)
+            : context.colors.primary;
+      }
     }
     return context.colors.primary;
   }
@@ -88,39 +275,50 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
     var index = 0;
     for (var i = 0; i < plan.slots.length; i++) {
       final slot = plan.slots[i];
-      final habit = slot.habit;
       rows.add(
         Entrance(
           index: index,
           delay: _entrance,
-          child: habit == null
+          child: slot.isGap
               ? TimelineGap(
                   minutes: slot.minutes,
                   from: _neighbourColor(plan, i - 1, -1),
                   to: _neighbourColor(plan, i + 1, 1),
+                  onTap: () => _scheduleAt(slot.start),
                 )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: TimelineBlock(
-                    habit: habit,
-                    date: _day,
-                    done: habit.isCompletedOn(_day),
-                    onOpen: () => AppNavigator.push(
-                      HabitDetailsPage(habitId: habit.id),
-                      fade: true,
+              : slot.isHabit
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: TimelineBlock(
+                        habit: slot.habit!,
+                        date: _day,
+                        done: slot.habit!.isCompletedOn(_day),
+                        onOpen: () => AppNavigator.push(
+                          HabitDetailsPage(habitId: slot.habit!.id),
+                          fade: true,
+                        ),
+                        onCheck: () => _check(slot.habit!),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: TimelineTodoBlock(
+                        todo: slot.todo!,
+                        date: _day,
+                        done: slot.todo!.isCompletedOn(_day),
+                        onOpen: () => _openTodo(slot.todo!),
+                        onCheck: () => _checkTodo(slot.todo!),
+                      ),
                     ),
-                    onCheck: () => _check(habit),
-                  ),
-                ),
         ),
       );
       index++;
     }
 
-    if (plan.anytime.isNotEmpty) {
+    if (plan.anytimeHabits.isNotEmpty) {
       rows.add(const SizedBox(height: 22));
       rows.add(SectionLabel(context.l10n.day_timeline_anytime));
-      for (final habit in plan.anytime) {
+      for (final habit in plan.anytimeHabits) {
         rows.add(
           Entrance(
             index: index,
@@ -143,18 +341,51 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
         index++;
       }
     }
+
+    if (plan.anytimeTodos.isNotEmpty) {
+      rows.add(const SizedBox(height: 22));
+      rows.add(SectionLabel(context.l10n.todos));
+      for (final todo in plan.anytimeTodos) {
+        rows.add(
+          Entrance(
+            index: index,
+            delay: _entrance,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _AnytimeTodoRow(
+                todo: todo,
+                date: _day,
+                done: todo.isCompletedOn(_day),
+                onOpen: () => _openTodo(todo),
+                onCheck: () => _checkTodo(todo),
+              ),
+            ),
+          ),
+        );
+        index++;
+      }
+    }
+
     return rows;
   }
 
   @override
   Widget build(BuildContext context) {
     final habits = context.watch<HabitsController>().habits;
-    final weekStart = context.watch<SettingsController>().weekStart;
-    final plan = DayPlan.of(habits, _day);
+    final todos = context.watch<TodosController>().all;
+    final style = context.watch<SettingsController>();
+    final todosEnabled = style.todosEnabled;
+    final weekStart = style.weekStart;
+
+    final plan = DayPlan.of(
+      habits,
+      _day,
+      todos: todosEnabled ? todos : const [],
+      filter: _filter,
+    );
     final locale = Localizations.localeOf(context).toString();
     final first = _day.startOfWeek(weekStart);
 
-    final style = context.watch<SettingsController>();
     final express = style.isExpressStyle;
     final minimal = style.isMinimalStyle;
     final pushed = ModalRoute.of(context)?.canPop ?? false;
@@ -181,6 +412,22 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
             ? null
             : Text(DateFormat.yMMMM(locale).format(_day)),
         actions: [
+          express
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Center(
+                    child: ExpressIconButton(
+                      icon: LucideIcons.plus,
+                      tooltip: 'Add',
+                      onPressed: _quickAdd,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  tooltip: 'Add',
+                  icon: const Icon(LucideIcons.plus),
+                  onPressed: _quickAdd,
+                ),
           if (!_isToday)
             express
                 ? Padding(
@@ -221,16 +468,32 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
                 first: first,
                 selected: _day,
                 habits: habits,
+                todos: todosEnabled ? todos : const [],
                 style: style.appStyle,
                 onSelected: _select,
                 onShift: _shiftWeek,
+              ),
+              if (todosEnabled)
+                _PlanFilterBar(
+                  selected: _filter,
+                  totalAll: plan.totalHabits + plan.totalTodos,
+                  totalHabits: plan.totalHabits,
+                  totalTodos: plan.totalTodos,
+                  style: style.appStyle,
+                  onChanged: (f) => setState(() => _filter = f),
+                ),
+              _PlanSummaryStrip(
+                plan: plan,
+                todosEnabled: todosEnabled,
               ),
               Expanded(
                 child: plan.isEmpty
                     ? AppEmptyState(
                         icon: LucideIcons.calendarClock,
                         title: context.l10n.day_timeline_empty,
-                        message: context.l10n.day_timeline_empty_sub,
+                        message: todosEnabled
+                            ? 'Schedule habits or tasks to build your day timeline.'
+                            : context.l10n.day_timeline_empty_sub,
                       )
                     : ListView(
                         padding:
@@ -255,11 +518,258 @@ class _DayTimelinePageState extends State<DayTimelinePage> {
   }
 }
 
+class _PlanFilterBar extends StatelessWidget {
+  const _PlanFilterBar({
+    required this.selected,
+    required this.totalAll,
+    required this.totalHabits,
+    required this.totalTodos,
+    required this.style,
+    required this.onChanged,
+  });
+
+  final PlanFilter selected;
+  final int totalAll;
+  final int totalHabits;
+  final int totalTodos;
+  final int style;
+  final ValueChanged<PlanFilter> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final muted = context.tokens.muted;
+    final express = style == 2;
+    final minimal = style == 1;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(express ? 16 : 14, 0, express ? 16 : 14, 8),
+      child: Container(
+        height: 38,
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+          borderRadius:
+              BorderRadius.circular(express ? 20 : (minimal ? 12 : 14)),
+          border: minimal
+              ? Border.all(color: muted.withValues(alpha: 0.18))
+              : null,
+        ),
+        padding: const EdgeInsets.all(3),
+        child: Row(
+          children: [
+            Expanded(
+              child: _FilterTab(
+                label: 'All',
+                count: totalAll,
+                selected: selected == PlanFilter.all,
+                express: express,
+                minimal: minimal,
+                onTap: () => onChanged(PlanFilter.all),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: _FilterTab(
+                label: 'Habits',
+                count: totalHabits,
+                selected: selected == PlanFilter.habits,
+                express: express,
+                minimal: minimal,
+                onTap: () => onChanged(PlanFilter.habits),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: _FilterTab(
+                label: 'Tasks',
+                count: totalTodos,
+                selected: selected == PlanFilter.todos,
+                express: express,
+                minimal: minimal,
+                onTap: () => onChanged(PlanFilter.todos),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterTab extends StatelessWidget {
+  const _FilterTab({
+    required this.label,
+    required this.count,
+    required this.selected,
+    required this.express,
+    required this.minimal,
+    required this.onTap,
+  });
+
+  final String label;
+  final int count;
+  final bool selected;
+  final bool express;
+  final bool minimal;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final muted = context.tokens.muted;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: selected
+                ? (minimal
+                    ? scheme.onSurface
+                    : (express ? scheme.primary : scheme.surface))
+                : Colors.transparent,
+            borderRadius:
+                BorderRadius.circular(express ? 16 : (minimal ? 9 : 11)),
+            boxShadow: selected && !minimal
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  color: selected
+                      ? (minimal
+                          ? scheme.surface
+                          : (express ? scheme.onPrimary : scheme.onSurface))
+                      : muted,
+                ),
+              ),
+              if (count > 0) ...[
+                const SizedBox(width: 5),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? (express
+                            ? scheme.onPrimary.withValues(alpha: 0.22)
+                            : scheme.surfaceContainerHighest)
+                        : scheme.surfaceContainerHighest.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$count',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      color: selected
+                          ? (minimal
+                              ? scheme.surface
+                              : (express ? scheme.onPrimary : scheme.onSurface))
+                          : muted,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlanSummaryStrip extends StatelessWidget {
+  const _PlanSummaryStrip({
+    required this.plan,
+    required this.todosEnabled,
+  });
+
+  final DayPlan plan;
+  final bool todosEnabled;
+
+  @override
+  Widget build(BuildContext context) {
+    if (plan.isEmpty) return const SizedBox.shrink();
+
+    final muted = context.tokens.muted;
+    final scheduledMinutes = plan.totalScheduledMinutes;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: [
+            if (scheduledMinutes > 0) ...[
+              Icon(LucideIcons.clock, size: 13, color: muted),
+              const SizedBox(width: 4),
+              Text(
+                '${spanLabel(scheduledMinutes)} planned',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: muted,
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
+            if (plan.totalHabits > 0) ...[
+              Icon(LucideIcons.sparkles, size: 13, color: muted),
+              const SizedBox(width: 4),
+              Text(
+                '${plan.completedHabits}/${plan.totalHabits} habits',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: muted,
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
+            if (todosEnabled && plan.totalTodos > 0) ...[
+              Icon(LucideIcons.checkSquare2, size: 13, color: muted),
+              const SizedBox(width: 4),
+              Text(
+                '${plan.completedTodos}/${plan.totalTodos} tasks',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: muted,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _WeekStrip extends StatelessWidget {
   const _WeekStrip({
     required this.first,
     required this.selected,
     required this.habits,
+    required this.todos,
     required this.style,
     required this.onSelected,
     required this.onShift,
@@ -268,6 +778,7 @@ class _WeekStrip extends StatelessWidget {
   final DateTime first;
   final DateTime selected;
   final List<Habit> habits;
+  final List<Todo> todos;
   final int style;
   final ValueChanged<DateTime> onSelected;
   final ValueChanged<int> onShift;
@@ -308,6 +819,7 @@ class _WeekStrip extends StatelessWidget {
                 first.day + i,
               ).isSameDay(selected),
               habits: habits,
+              todos: todos,
               style: style,
               onTap: onSelected,
             ),
@@ -357,6 +869,7 @@ class _DayChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.habits,
+    required this.todos,
     required this.style,
     required this.onTap,
   });
@@ -365,6 +878,7 @@ class _DayChip extends StatelessWidget {
   final String label;
   final bool selected;
   final List<Habit> habits;
+  final List<Todo> todos;
   final int style;
   final ValueChanged<DateTime> onTap;
 
@@ -378,6 +892,11 @@ class _DayChip extends StatelessWidget {
     final dots = [
       for (final habit in habits)
         if (DayPlan.isDueOn(habit, day) && habit.isPlanned) habit.color,
+      for (final todo in todos)
+        if (DayPlan.isTodoDueOn(todo, day) && todo.minutes != null)
+          (todo.priority != TodoPriority.none
+              ? todoPriorityColor(context, todo.priority)
+              : accent),
     ].take(4).toList();
 
     return Semantics(
@@ -578,6 +1097,154 @@ class _AnytimeRow extends StatelessWidget {
               TimelineCheck(
                 habit: habit,
                 date: date,
+                done: done,
+                onTap: onCheck,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnytimeTodoRow extends StatelessWidget {
+  const _AnytimeTodoRow({
+    required this.todo,
+    required this.date,
+    required this.done,
+    required this.onOpen,
+    required this.onCheck,
+  });
+
+  final Todo todo;
+  final DateTime date;
+  final bool done;
+  final VoidCallback onOpen;
+  final VoidCallback onCheck;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final muted = context.tokens.muted;
+    final priorityColor = todo.priority != TodoPriority.none
+        ? todoPriorityColor(context, todo.priority)
+        : scheme.primary;
+
+    final project = todo.project.isNotEmpty
+        ? context.watch<TodoTagsController>().byId(todo.project)
+        : null;
+
+    final accentColor = project != null ? project.color : priorityColor;
+
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: onOpen,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerHighest.withValues(
+              alpha: done ? 0.35 : 0.6,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: done ? 0.35 : 0.18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Icon(
+                    todo.isRecurring
+                        ? LucideIcons.repeat
+                        : LucideIcons.checkSquare2,
+                    color: done ? scheme.surface : accentColor,
+                    size: 18,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      todo.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: done ? muted : scheme.onSurface,
+                        decoration: done ? TextDecoration.lineThrough : null,
+                        decorationColor: muted,
+                      ),
+                    ),
+                    if (project != null ||
+                        todo.priority != TodoPriority.none ||
+                        todo.steps.isNotEmpty ||
+                        todo.isRecurring) ...[
+                      const SizedBox(height: 3),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 2,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (project != null)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LucideIcons.folder,
+                                  size: 10,
+                                  color: project.color,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  project.name,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: project.color,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (todo.priority != TodoPriority.none)
+                            Text(
+                              todo.priority.name.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: priorityColor,
+                              ),
+                            ),
+                          if (todo.steps.isNotEmpty)
+                            Text(
+                              '${todo.steps.where((s) => s.done).length}/${todo.steps.length}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: muted,
+                              ),
+                            ),
+                          if (todo.isRecurring)
+                            Icon(LucideIcons.repeat, size: 11, color: muted),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              TimelineTodoCheck(
+                todo: todo,
                 done: done,
                 onTap: onCheck,
               ),

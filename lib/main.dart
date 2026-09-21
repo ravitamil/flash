@@ -37,7 +37,7 @@ Future<void> main() async {
   try {
     await _startup();
   } catch (e, s) {
-    debugPrint('Streak could not start: $e');
+    debugPrint('Flash could not start: $e');
     debugPrintStack(stackTrace: s);
     runApp(StartupFailure(error: '$e', logPath: _writeStartupLog(e, s)));
     return;

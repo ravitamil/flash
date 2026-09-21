@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:streak/core/extensions/date_extensions.dart';
 import 'package:streak/features/todos/data/todo.dart';
 import 'package:streak/features/todos/data/todo_groups.dart';
+import 'package:streak/features/todos/data/todo_recurrence.dart';
 
 Todo _todo(
   String id, {
@@ -141,13 +142,45 @@ void main() {
     expect(list.map((t) => t.id), ['last', 'first']);
   });
 
+  test('completed recurring to-dos appear in sortCompleted with latest completion date', () {
+    final recurring = Todo(
+      id: 'meeting',
+      text: 'Client meeting',
+      createdAt: DateTime(2026, 8, 1),
+      recurrence: const TodoRecurrence(kind: TodoRecurrenceKind.weekdays),
+      completedDates: ['2026-08-10', '2026-08-11'],
+      done: false,
+    );
+    final oneOff = Todo(
+      id: 'report',
+      text: 'Send report',
+      createdAt: DateTime(2026, 8, 1),
+      done: true,
+      doneAt: DateTime(2026, 8, 9),
+    );
+    final open = _todo('open');
+
+    final list = sortCompleted([recurring, oneOff, open]);
+    expect(list.map((t) => t.id), ['meeting', 'report']);
+    expect(recurring.hasCompletions, isTrue);
+    expect(recurring.lastCompletedAt, DateTime(2026, 8, 11));
+  });
+
   test('a to-do survives a round trip through its map', () {
+    final d1 = DateTime(2026, 8, 10);
+    final d2 = DateTime(2026, 8, 11);
     final todo = _todo(
       'trip',
       due: tomorrow,
       minutes: 7 * 60 + 45,
       priority: TodoPriority.medium,
-    ).copyWith(photos: const ['/a.jpg']);
+    ).copyWith(
+      photos: const ['/a.jpg'],
+      durationMinutes: 45,
+      text: 'Meeting with Client A\nAgenda:\n1. Status\n2. Q&A',
+      recurrence: const TodoRecurrence(kind: TodoRecurrenceKind.weekdays),
+      completedDates: [d1.dayKey, d2.dayKey],
+    );
     final back = Todo.fromMap(todo.toMap());
 
     expect(back.id, todo.id);
@@ -156,6 +189,14 @@ void main() {
     expect(back.priority, TodoPriority.medium);
     expect(back.photos, ['/a.jpg']);
     expect(back.doneAt, isNull);
+    expect(back.durationMinutes, 45);
+    expect(back.title, 'Meeting with Client A');
+    expect(back.body, 'Agenda:\n1. Status\n2. Q&A');
+    expect(back.recurrence?.kind, TodoRecurrenceKind.weekdays);
+    expect(back.isRecurring, isTrue);
+    expect(back.completedDates, [d1.dayKey, d2.dayKey]);
+    expect(back.isCompletedOn(d1), isTrue);
+    expect(back.isCompletedOn(DateTime(2026, 8, 12)), isFalse);
   });
 
   test('clearing the hour survives copyWith', () {
@@ -164,4 +205,43 @@ void main() {
     expect(todo.copyWith(clearMinutes: true).minutes, isNull);
     expect(todo.copyWith(minutes: 60).minutes, 60);
   });
+
+  group('TodoRecurrence nextOccurrence', () {
+    test('daily recurrence advances to next day', () {
+      const rec = TodoRecurrence.daily();
+      final current = DateTime(2026, 8, 10); // Monday
+      expect(rec.nextOccurrence(current), DateTime(2026, 8, 11));
+    });
+
+    test('weekday recurrence advances Mon->Tue and Fri->Mon', () {
+      const rec = TodoRecurrence.weekdays();
+      final monday = DateTime(2026, 8, 10); // Monday
+      expect(rec.nextOccurrence(monday), DateTime(2026, 8, 11)); // Tuesday
+
+      final friday = DateTime(2026, 8, 14); // Friday
+      expect(rec.nextOccurrence(friday), DateTime(2026, 8, 17)); // Monday (skips Sat & Sun)
+
+      final saturday = DateTime(2026, 8, 15); // Saturday
+      expect(rec.nextOccurrence(saturday), DateTime(2026, 8, 17)); // Monday
+    });
+
+    test('weekly recurrence advances 7 days', () {
+      const rec = TodoRecurrence.weekly();
+      final current = DateTime(2026, 8, 10);
+      expect(rec.nextOccurrence(current), DateTime(2026, 8, 17));
+    });
+
+    test('monthly recurrence advances to same day next month', () {
+      const rec = TodoRecurrence.monthly();
+      final current = DateTime(2026, 8, 10);
+      expect(rec.nextOccurrence(current), DateTime(2026, 9, 10));
+    });
+
+    test('custom interval recurrence advances by interval days', () {
+      const rec = TodoRecurrence(kind: TodoRecurrenceKind.custom, interval: 3);
+      final current = DateTime(2026, 8, 10);
+      expect(rec.nextOccurrence(current), DateTime(2026, 8, 13));
+    });
+  });
 }
+
